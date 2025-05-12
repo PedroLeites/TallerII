@@ -21,9 +21,14 @@ public class PrincipalVista extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
+	//Este método asocia un ActionListener al botón btnCargar.
 	public void setControlador(ActionListener al) { 
 		btnCargar.addActionListener(al); 
 	}
+	//Esto rompería el patrón MVC
+	/* btnCargar.addActionListener(e -> {
+   		// código que procesa el Excel y modifica la tabla
+	});*/
 	
     public void agregarFila(Object[] fila) { 
     	modeloTabla.addRow(fila); 

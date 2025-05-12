@@ -16,7 +16,7 @@ public class PrincipalControlador implements ActionListener{
 	public PrincipalControlador(PrincipalVista v) {
 		importador = new ImportadorExcel();
 		this.vista = v;
-		vista.setControlador(this);
+		vista.setControlador(this); //Botón, cuando te hagan clic, llamá al método actionPerformed() de este controlador
 	}
 	
 	 @Override
