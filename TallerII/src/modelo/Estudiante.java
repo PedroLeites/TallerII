@@ -2,6 +2,7 @@ package modelo;
 
 public class Estudiante {
 	//Atributos
+	System.out.println("Estudiante class loaded");
 	private int CI;
 	private String nombre;
 	private String email;
@@ -13,7 +14,7 @@ public class Estudiante {
 		
 	}
 	
-	//Constructor común
+	//Constructor comï¿½n
 	public Estudiante(int cedula, String nombre, String email, String libro, String fechaVencimiento) {
 		this.CI = cedula;
 		this.nombre = nombre;
