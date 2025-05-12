@@ -18,7 +18,9 @@ public class ImportadorExcel {
 			for (int i = 1; i <= hoja.getLastRowNum(); i++) { //Comenzamos desde la segunda fila
 				XSSFRow fila = hoja.getRow(i);
 				
-				int ci = (int) fila.getCell(0).getNumericCellValue(); //CI
+				//int ci = (int) fila.getCell(0).getNumericCellValue(); 
+				String ciTexto = fila.getCell(0).toString().trim();
+				int ci = Integer.parseInt(ciTexto); //CI
 				String nombre = fila.getCell(1).getStringCellValue();//Nombre
 				String email = fila.getCell(2).getStringCellValue();//Email
 				String libro = fila.getCell(3).getStringCellValue();//Libro
