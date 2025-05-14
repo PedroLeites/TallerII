@@ -9,5 +9,7 @@
 	<classpathentry kind="lib" path="C:/Users/pedro/OneDrive/Documentos/GitHub/TallerII/TallerII/libs/POI 4.1.2/poi-4.1.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/pedro/OneDrive/Documentos/GitHub/TallerII/TallerII/libs/POI 4.1.2/poi-ooxml-4.1.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/pedro/OneDrive/Documentos/GitHub/TallerII/TallerII/libs/POI 4.1.2/xmlbeans-3.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/pedro/OneDrive/Documentos/GitHub/TallerII/TallerII/libs/Java Mail/activation-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/pedro/OneDrive/Documentos/GitHub/TallerII/TallerII/libs/Java Mail/javax.mail-1.6.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

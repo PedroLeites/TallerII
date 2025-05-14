@@ -1,5 +1,7 @@
 package modelo;
 
+import java.time.LocalDate;
+
 public class Fecha {
 	//Atributos
 	private int dia;
@@ -49,6 +51,12 @@ public class Fecha {
 	public void setAnio(int anio) {
 		this.anio = anio;
 	}
+	
+	//Métodos específicos
+    public boolean esHoy() {
+        LocalDate hoy = LocalDate.now();
+        return this.dia == hoy.getDayOfMonth() && this.mes == hoy.getMonthValue() && this.anio == hoy.getYear();
+    }
 
 	@Override
 	public String toString() {
