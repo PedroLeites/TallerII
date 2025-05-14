@@ -6,7 +6,7 @@ public class Estudiante {
 	private String nombre;
 	private String email;
 	private String libro;
-	private String fechaVencimiento;
+	private Fecha fechaVencimiento;
 	
 	//Constructor por defecto
 	public Estudiante() {
@@ -14,7 +14,7 @@ public class Estudiante {
 	}
 	
 	//Constructor común
-	public Estudiante(int cedula, String nombre, String email, String libro, String fechaVencimiento) {
+	public Estudiante(int cedula, String nombre, String email, String libro, Fecha fechaVencimiento) {
 		this.CI = cedula;
 		this.nombre = nombre;
 		this.email = email;
@@ -64,11 +64,11 @@ public class Estudiante {
 		this.libro = libro;
 	}
 
-	public String getFechaVencimiento() {
+	public Fecha getFechaVencimiento() {
 		return fechaVencimiento;
 	}
 
-	public void setFechaVencimiento(String fechaVencimiento) {
+	public void setFechaVencimiento(Fecha fechaVencimiento) {
 		this.fechaVencimiento = fechaVencimiento;
 	}
 

@@ -32,7 +32,7 @@ public class PrincipalControlador implements ActionListener{
 			         est.getNombre(),
 			         est.getEmail(),
 			         est.getLibro(),
-			         est.getFechaVencimiento()
+			         est.getFechaVencimiento().toString()
 			     });
 			 }
 			 //colec.obtenerTodos().forEach(est -> vista.agregarFila(new Object[]{est.getCI(), est.getNombre(), est.getEmail(), est.getLibro(), est.getFechaVencimiento()}));
