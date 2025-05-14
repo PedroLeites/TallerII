@@ -4,10 +4,11 @@ import modelo.Fecha;
 import modelo.Estudiante;
 import modelo.ColeccionEstudiantes;
 import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.ss.usermodel.*;
 import java.io.FileInputStream;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.time.ZoneId;
+import java.util.Date;
 
 public class ImportadorExcel {
 
@@ -25,22 +26,27 @@ public class ImportadorExcel {
 				//int ci = (int) fila.getCell(0).getNumericCellValue(); 
 				String ciTexto = fila.getCell(0).toString().trim();
 				int ci = Integer.parseInt(ciTexto); //CI
+				
 				String nombre = fila.getCell(1).getStringCellValue();//Nombre
 				String email = fila.getCell(2).getStringCellValue();//Email
 				String libro = fila.getCell(3).getStringCellValue();//Libro
 				
 				//Fecha
-				String fechaTexto = fila.getCell(4).toString().trim();
 				Fecha fecha;
-				try {
-				    // Intenta parsear como yyyy-MM-dd
-				    LocalDate localDate = LocalDate.parse(fechaTexto, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-				    fecha = new Fecha(localDate.getDayOfMonth(), localDate.getMonthValue(), localDate.getYear());
-				} catch (DateTimeParseException ex) {
-				    // Si falla, intentamos con dd/MM/yyyy
-				    LocalDate localDate = LocalDate.parse(fechaTexto, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-				    fecha = new Fecha(localDate.getDayOfMonth(), localDate.getMonthValue(), localDate.getYear());
-				}
+                Cell celdaFecha = fila.getCell(4);
+                if (celdaFecha.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(celdaFecha)) {
+                    Date fechaExcel = celdaFecha.getDateCellValue();
+                    LocalDate localDate = fechaExcel.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    fecha = new Fecha(localDate.getDayOfMonth(), localDate.getMonthValue(), localDate.getYear());
+                } else {
+                    // Alternativa: parseo desde string manual si no es tipo fecha
+                    String textoFecha = celdaFecha.toString().trim();
+                    String[] partes = textoFecha.split("[/-]");
+                    int dia = Integer.parseInt(partes[0]);
+                    int mes = Integer.parseInt(partes[1]);
+                    int anio = Integer.parseInt(partes[2]);
+                    fecha = new Fecha(dia, mes, anio);
+                }
 				
 				Estudiante estudiante = new Estudiante(ci,nombre,email,libro,fecha);
 		        coleccion.agregar(estudiante); //Agregamos el estudiante a la colección
