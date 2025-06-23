@@ -11,14 +11,22 @@ public class PrincipalVista extends JFrame {
 	private JButton btnCargar = new JButton("Cargar Excel");
 	
 	public PrincipalVista() {
-		super("Morosos Biblioteca INET");
-        modeloTabla = new DefaultTableModel(new String[]{"CI","Nombre","Email","Libro","Vencimiento"}, 0);
+		super("Gestión de Préstamos Vencidos - Biblioteca INET");
+		
+		// Columnas de la tabla para mostrar los datos de los préstamos
+        modeloTabla = new DefaultTableModel(new String[] {
+            "Fecha Préstamo", "Fecha Devolución Prevista", "Días Retraso",
+            "CI Estudiante", "Nombre Estudiante", "Email Estudiante",
+            "Título Libro", "Cote Libro", "CB Libro"
+        }, 0);
         tabla = new JTable(modeloTabla);
+        
         this.setLayout(new BorderLayout());
         this.add(new JScrollPane(tabla), BorderLayout.CENTER);
         this.add(btnCargar, BorderLayout.SOUTH);
-        this.setSize(600, 400);
+        this.setSize(900, 500);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null); // Centrar la ventana
 	}
 	
 	//Este método asocia un ActionListener al botón btnCargar.

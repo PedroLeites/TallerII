@@ -1,17 +1,17 @@
 package controlador;
 
-import modelo.Estudiante;
+import modelo.Prestamo;
 import modelo.ColeccionPrestamos;
 import persistencia.ImportadorExcel;
 import vista.PrincipalVista;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
-import java.util.Iterator;
 
 public class PrincipalControlador implements ActionListener{
 	private PrincipalVista vista;
 	private ImportadorExcel importador;
+	private ColeccionPrestamos prestamosVencidos; // Para almacenar los préstamos
 	
 	public PrincipalControlador(PrincipalVista v) {
 		importador = new ImportadorExcel();
@@ -23,20 +23,33 @@ public class PrincipalControlador implements ActionListener{
 	 public void actionPerformed(ActionEvent e) {
 		 vista.limpiarTabla();
 		 try {
-			 ColeccionPrestamos colec = importador.importarDeExcel("morosos.xlsx");
-			 Iterator<Estudiante> it = colec.obtenerTodos().iterator();
-			 while (it.hasNext()) {
-			     Estudiante est = it.next();
-			     vista.agregarFila(new Object[]{
-			         est.getCI(),
-			         est.getNombre(),
-			         est.getEmail(),
-			     });
-			 }
-			 //colec.obtenerTodos().forEach(est -> vista.agregarFila(new Object[]{est.getCI(), est.getNombre(), est.getEmail(), est.getLibro(), est.getFechaVencimiento()}));
-	        } catch (Exception ex) {
-	            JOptionPane.showMessageDialog(vista, "Error al leer Excel: " + ex.getMessage());
-	        }
-	    }
+			 prestamosVencidos = importador.importarDeExcel("datos.xls");
+			 
+			 if(prestamosVencidos.vacia()) {
+	                JOptionPane.showMessageDialog(vista, "No se encontraron préstamos vencidos en el archivo.", "Información", JOptionPane.INFORMATION_MESSAGE);
+	                return;
+	         }
+			 
+			 for (int i = 0; i < prestamosVencidos.largo(); i++) {
+				    Prestamo prestamo = prestamosVencidos.obtenerTodos().get(i);
+				    vista.agregarFila(new Object[]{
+				        prestamo.getFechaPrestamo(),
+				        prestamo.getFechaDevolucionPrevista(),
+				        prestamo.getDiasRetraso(),
+				        prestamo.getEstudiante().getCI(),
+				        prestamo.getEstudiante().getNombre(),
+				        prestamo.getEstudiante().getEmail(),
+				        prestamo.getLibro().getTitulo(),
+				        prestamo.getLibro().getExplCote(),
+				        prestamo.getLibro().getExplCb()
+				    });
+				}
+			 
+			 JOptionPane.showMessageDialog(vista, "Datos cargados exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+		 
+		 } catch (Exception ex) {
+			 JOptionPane.showMessageDialog(vista, "Error al leer Excel: " + ex.getMessage());
+	     }
+	 }
 	
 }

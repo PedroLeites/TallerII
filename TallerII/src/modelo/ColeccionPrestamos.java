@@ -51,5 +51,10 @@ public class ColeccionPrestamos {
         }
         return existe;
     }
+    
+    // Verifica si la colección de préstamos está vacía
+    public boolean vacia() {
+        return prestamos.isEmpty();
+    }
 	
 }
