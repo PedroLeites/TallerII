@@ -2,11 +2,10 @@ package modelo;
 
 public class Estudiante {
 	//Atributos
-	private int CI;
-	private String nombre;
-	private String email;
-	private String libro;
-	private String fechaVencimiento;
+	private int idPMB; // id_empr del PMB
+	private int CI; // empr_cb
+	private String nombre; // empr_nom + empr_prenom
+	private String email; // empr_mail
 	
 	//Constructor por defecto
 	public Estudiante() {
@@ -14,24 +13,26 @@ public class Estudiante {
 	}
 	
 	//Constructor común
-	public Estudiante(int cedula, String nombre, String email, String libro, String fechaVencimiento) {
-		this.CI = cedula;
-		this.nombre = nombre;
-		this.email = email;
-		this.libro = libro;
-		this.fechaVencimiento = fechaVencimiento;
+	public Estudiante(int idPMB, int CI, String nombre, String email) {
+		this.idPMB = idPMB;
+        this.CI = CI;
+        this.nombre = nombre;
+        this.email = email;
 	}
 	
 	//Constructor de copia
 	public Estudiante(Estudiante e) {
-		this.CI = e.CI;
-		this.nombre = e.nombre;
-		this.email = e.email;
-		this.libro = e.libro;
-		this.fechaVencimiento = e.fechaVencimiento;
+		this.idPMB = e.idPMB;
+        this.CI = e.CI;
+        this.nombre = e.nombre;
+        this.email = e.email;
 	}
 
 	//Selectores y Modificadores
+	public int getIdPMB() {
+		return idPMB;
+	}
+	
 	public int getCI() {
 		return CI;
 	}
@@ -56,26 +57,9 @@ public class Estudiante {
 		this.email = email;
 	}
 
-	public String getLibro() {
-		return libro;
-	}
-
-	public void setLibro(String libro) {
-		this.libro = libro;
-	}
-
-	public String getFechaVencimiento() {
-		return fechaVencimiento;
-	}
-
-	public void setFechaVencimiento(String fechaVencimiento) {
-		this.fechaVencimiento = fechaVencimiento;
-	}
-
 	@Override
 	public String toString() {
-		return "Estudiante [CI=" + CI + ", nombre=" + nombre + ", email=" + email + ", libro=" + libro
-				+ ", fechaVencimiento=" + fechaVencimiento + "]";
+		return "Estudiante [idPMB=" + idPMB + ", CI=" + CI + ", nombre=" + nombre + ", email=" + email + "]";
 	}
 	
 }
