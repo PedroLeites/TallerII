@@ -1,7 +1,7 @@
 package controlador;
 
 import modelo.Estudiante;
-import modelo.ColeccionEstudiantes;
+import modelo.ColeccionPrestamos;
 import persistencia.ImportadorExcel;
 import vista.PrincipalVista;
 import java.awt.event.ActionEvent;
@@ -23,7 +23,7 @@ public class PrincipalControlador implements ActionListener{
 	 public void actionPerformed(ActionEvent e) {
 		 vista.limpiarTabla();
 		 try {
-			 ColeccionEstudiantes colec = importador.importarDeExcel("morosos.xlsx");
+			 ColeccionPrestamos colec = importador.importarDeExcel("morosos.xlsx");
 			 Iterator<Estudiante> it = colec.obtenerTodos().iterator();
 			 while (it.hasNext()) {
 			     Estudiante est = it.next();
@@ -31,8 +31,6 @@ public class PrincipalControlador implements ActionListener{
 			         est.getCI(),
 			         est.getNombre(),
 			         est.getEmail(),
-			         est.getLibro(),
-			         est.getFechaVencimiento()
 			     });
 			 }
 			 //colec.obtenerTodos().forEach(est -> vista.agregarFila(new Object[]{est.getCI(), est.getNombre(), est.getEmail(), est.getLibro(), est.getFechaVencimiento()}));
