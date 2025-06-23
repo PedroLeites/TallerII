@@ -21,8 +21,8 @@ public class ImportadorExcel {
 			XSSFWorkbook wb = new XSSFWorkbook(flujoEntrada); //Toma el contenido leído desde el archivo y lo convierte en una estructura de datos compatible con Java
 			XSSFSheet hoja = wb.getSheetAt(0); //Usamos la primera hoja
 			
-			// Iterar sobre las filas, empezando desde la segunda fila (índice 1) para omitir los encabezados
-			for (int i = 1; i <= hoja.getLastRowNum(); i++) {
+			// Iterar sobre las filas, empezando desde la cuarta fila (índice 3) para omitir los encabezados
+			for (int i = 3; i <= hoja.getLastRowNum(); i++) {
 				XSSFRow fila = hoja.getRow(i);
                 if (fila == null) {
                     continue; // Saltar filas vacías
@@ -38,15 +38,15 @@ public class ImportadorExcel {
                 String emprNom = obtenerCeldaString(fila, 4); // empr_nom
                 String emprPrenom = obtenerCeldaString(fila, 5); // empr_prenom
                 String emprMail = obtenerCeldaString(fila, 6); // empr_mail
-                int emprCb = (int) obtenerCeldaNumeric(fila, 7); // empr_cb
+                int emprCb = (int) obtenerCeldaNumeric(fila, 8); // empr_cb
                 
-                String explCote = obtenerCeldaString(fila, 8); // expl_cote
-                String explCb = obtenerCeldaString(fila, 9); // expl_cb
-                String tit = obtenerCeldaString(fila, 11); // tit (columna 11, ya que la 10 es expl_notice)
-                String tdocLibelle = obtenerCeldaString(fila, 12); // tdoc_libelle
+                String explCote = obtenerCeldaString(fila, 9); // expl_cote
+                String explCb = obtenerCeldaString(fila, 10); // expl_cb
+                String tit = obtenerCeldaString(fila, 14); // tit 
+                String tdocLibelle = obtenerCeldaString(fila, 15); // tdoc_libelle
                 
                 // Crear objetos Estudiante, Libro y Prestamo
-                String nombreCompletoEstudiante = emprNom + " " + emprPrenom;
+                String nombreCompletoEstudiante = emprPrenom + " " + emprNom;
                 Estudiante estudiante = new Estudiante(idEmprPMB, emprCb, nombreCompletoEstudiante, emprMail);
                 
                 Libro libro = new Libro(explCote, explCb, tit, tdocLibelle);
