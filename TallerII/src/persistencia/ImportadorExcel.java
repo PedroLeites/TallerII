@@ -6,14 +6,13 @@ import modelo.Libro;
 import modelo.Prestamo;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.*;
 import javax.swing.JOptionPane;
 //Para .xlsx
-import org.apache.poi.xssf.usermodel.*;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Cell;
 //Para .xls
-import jxl.*;
 import jxl.read.biff.BiffException;
 
 public class ImportadorExcel {
