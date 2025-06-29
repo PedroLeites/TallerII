@@ -1,12 +1,12 @@
-import vista.PrincipalVista;
-import controlador.PrincipalControlador;
+import vista.DatosVista;
+import controlador.DatosControlador;
 import javax.swing.SwingUtilities;
 
 public class Principal {
 	public static void main(String[] args) {
 		
-		PrincipalVista ventana = new PrincipalVista();
-		PrincipalControlador controladorVentana = new PrincipalControlador(ventana);
+		DatosVista ventana = new DatosVista();
+		DatosControlador controladorVentana = new DatosControlador(ventana);
 		ventana.setVisible(true);
 		
 		/*

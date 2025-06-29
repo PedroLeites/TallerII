@@ -5,26 +5,26 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-public class PrincipalVista extends JFrame {
+public class DatosVista extends JFrame {
 	private JTable tabla;
 	private DefaultTableModel modeloTabla;
-	private JButton btnCargar = new JButton("Cargar Excel");
+	private JButton btnCargar = new JButton("Cargar datos");
 	
-	public PrincipalVista() {
-		super("Gestión de Préstamos Vencidos - Biblioteca INET");
+	public DatosVista() {
+		super("Datos de préstamos vencidos");
 		
 		// Columnas de la tabla para mostrar los datos de los préstamos
         modeloTabla = new DefaultTableModel(new String[] {
-            "Fecha Préstamo", "Fecha Devolución Prevista", "Días Retraso",
-            "CI Estudiante", "Nombre Estudiante", "Email Estudiante",
-            "Título Libro", "Cote Libro", "CB Libro"
+        		"Fecha Préstamo", "Fecha Devolución Prevista", "Días de Retraso",
+                "ID Usuario", "Nombre Completo", "Correo Electrónico",
+                "Título del Libro", "ID del Libro"
         }, 0);
         tabla = new JTable(modeloTabla);
         
         this.setLayout(new BorderLayout());
         this.add(new JScrollPane(tabla), BorderLayout.CENTER);
         this.add(btnCargar, BorderLayout.SOUTH);
-        this.setSize(900, 500);
+        this.setSize(1000, 600);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null); // Centrar la ventana
 	}
@@ -33,6 +33,7 @@ public class PrincipalVista extends JFrame {
 	public void setControlador(ActionListener al) { 
 		btnCargar.addActionListener(al); 
 	}
+	
 	//Esto rompería el patrón MVC
 	/* btnCargar.addActionListener(e -> {
    		// código que procesa el Excel y modifica la tabla
