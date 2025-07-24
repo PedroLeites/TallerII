@@ -16,7 +16,7 @@ public class DatosControlador implements ActionListener{
 	public DatosControlador(DatosVista v) {
 		this.manejadora = new ManejadoraDeDatos();
 		this.vista = v;
-		this.vista.setControlador(this); //Botón, cuando te hagan clic, llamá al método actionPerformed() de este controlador
+		this.vista.setControladorDatos(this); //Botón, cuando te hagan clic, llamá al método actionPerformed() de este controlador
 	}
 	
 	 @Override

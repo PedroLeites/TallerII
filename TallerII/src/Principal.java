@@ -1,5 +1,6 @@
 import vista.DatosVista;
 import controlador.DatosControlador;
+import controlador.CorreoControlador;
 import javax.swing.SwingUtilities;
 
 public class Principal {
@@ -7,6 +8,7 @@ public class Principal {
 		
 		DatosVista ventana = new DatosVista();
 		DatosControlador controladorVentana = new DatosControlador(ventana);
+		CorreoControlador controladorMails = new CorreoControlador(ventana);
 		ventana.setVisible(true);
 		
 		/*

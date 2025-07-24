@@ -5,10 +5,15 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+import controlador.CorreoControlador;
+import modelo.Correo;
+
 public class DatosVista extends JFrame {
 	private JTable tabla;
 	private DefaultTableModel modeloTabla;
 	private JButton btnCargar = new JButton("Cargar datos");
+	private JButton btnEnviar = new JButton("Enviar correo");
+	JPanel panelBotones = new JPanel();
 	
 	public DatosVista() {
 		super("Datos de préstamos vencidos");
@@ -23,15 +28,25 @@ public class DatosVista extends JFrame {
         
         this.setLayout(new BorderLayout());
         this.add(new JScrollPane(tabla), BorderLayout.CENTER);
-        this.add(btnCargar, BorderLayout.SOUTH);
+        
+        panelBotones.setLayout(new FlowLayout(FlowLayout.CENTER));
+        panelBotones.add(btnCargar);
+        panelBotones.add(btnEnviar);
+        
+        this.add(panelBotones, BorderLayout.SOUTH);
+        
         this.setSize(1000, 600);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null); // Centrar la ventana
 	}
 	
 	//Este método asocia un ActionListener al botón btnCargar.
-	public void setControlador(ActionListener al) { 
+	public void setControladorDatos(ActionListener al) { 
 		btnCargar.addActionListener(al); 
+	}
+	
+	public void setControladorCorreo(ActionListener al) {
+		btnEnviar.addActionListener(al);
 	}
 	
 	//Esto rompería el patrón MVC
@@ -47,4 +62,16 @@ public class DatosVista extends JFrame {
     	modeloTabla.setRowCount(0); 
     }
 	
+ // Método que el controlador usará para obtener la fila seleccionada
+    public Object[] getDatosFilaSeleccionada() {
+        int fila = tabla.getSelectedRow();
+        if (fila == -1) return null;
+
+        Object[] datos = new Object[modeloTabla.getColumnCount()];
+        for (int i = 0; i < datos.length; i++) {
+            datos[i] = modeloTabla.getValueAt(fila, i);
+        }
+        return datos;
+    }
+    
 }
