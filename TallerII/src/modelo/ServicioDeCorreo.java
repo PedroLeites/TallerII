@@ -6,8 +6,8 @@ import java.util.Properties;
 import modelo.Correo;
 
 public class ServicioDeCorreo {
-	private final String remitente = "taller2inet2025@gmail.com";
-    private final String contraseña = "taller2inet2025";
+	private final String remitente = "leitespedro2004@gmail.com";
+    private final String contraseña = "ymcb uzco roas xppx";
     
     public boolean enviar(Correo correo) {
     	boolean seMando = false;
