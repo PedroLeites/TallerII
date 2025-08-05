@@ -9,7 +9,7 @@ public class Usuario {
     private ColeccionPrestamos prestamos;
     
     public Usuario() {
-    	
+    	this.prestamos = new ColeccionPrestamos();
     }
     
     public Usuario(int id, int ci, String nombre, String apellido, String correo) {
@@ -19,6 +19,15 @@ public class Usuario {
         this.apellido = apellido;
         this.correo = correo;
         this.prestamos = new ColeccionPrestamos();
+    }
+    
+    public Usuario(Usuario u) {
+        this.id = u.id;
+        this.ci = u.ci;
+        this.nombre = u.nombre;
+        this.apellido = u.apellido;
+        this.correo = u.correo;
+        this.prestamos = u.prestamos;
     }
 
 	public int getId() {

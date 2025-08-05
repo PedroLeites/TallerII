@@ -18,6 +18,14 @@ public class Prestamo {
         this.idLibro = idLibro;
         this.tituloLibro = tituloLibro;
     }
+    
+    public Prestamo(Prestamo p) {
+        this.fechaPrestamo = p.fechaPrestamo;
+        this.fechaDevolucionPrevista = p.fechaDevolucionPrevista;
+        this.diasRetraso = p.diasRetraso;
+        this.idLibro = p.idLibro;
+        this.tituloLibro = p.tituloLibro;
+    }
 
     // Getters y Setters
     public Fecha getFechaPrestamo() {

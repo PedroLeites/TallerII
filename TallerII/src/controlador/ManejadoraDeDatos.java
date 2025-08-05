@@ -6,6 +6,8 @@ import jxl.Workbook;
 
 import modelo.Fecha;
 import modelo.ColeccionUsuarios;
+import modelo.ColeccionPrestamos;
+import java.util.ArrayList;
 import modelo.Datos;
 import modelo.Prestamo;
 import modelo.Usuario;
@@ -97,23 +99,30 @@ public class ManejadoraDeDatos implements ActionListener {
         vista.limpiarTabla();
         importarDatos();
 
-        for (Usuario usuario : usuarios.getUsuarios().values()) {
-            for (Prestamo prestamo : usuario.getPrestamos().obtenerTodos()) {
+        ArrayList<Usuario> listaUsuarios = usuarios.getUsuarios();
+
+        for (int i = 0; i < listaUsuarios.size(); i++) {
+            Usuario usuario = listaUsuarios.get(i);
+            ArrayList<Prestamo> listaPrestamos = usuario.getPrestamos().getPrestamos();
+
+            for (int j = 0; j < listaPrestamos.size(); j++) {
+                Prestamo prestamo = listaPrestamos.get(j);
                 vista.agregarFila(new Object[]{
-                        prestamo.getFechaPrestamo().toString(),
-                        prestamo.getFechaDevolucionPrevista().toString(),
-                        prestamo.getDiasRetraso(),
-                        usuario.getId(),
-                        usuario.getNombreCompleto(),
-                        usuario.getCorreo(),
-                        prestamo.getTituloLibro(),
-                        prestamo.getIdLibro()
+                    prestamo.getFechaPrestamo().toString(),
+                    prestamo.getFechaDevolucionPrevista().toString(),
+                    prestamo.getDiasRetraso(),
+                    usuario.getId(),
+                    usuario.getNombreCompleto(),
+                    usuario.getCorreo(),
+                    prestamo.getTituloLibro(),
+                    prestamo.getIdLibro()
                 });
             }
         }
 
         JOptionPane.showMessageDialog(vista, "Datos cargados exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
+
 
     
 }

@@ -1,31 +1,57 @@
 package modelo;
 
-import java.util.Hashtable;
+import java.util.ArrayList;
 
 public class ColeccionUsuarios {
-	private Hashtable<Integer, Usuario> usuarios;
-	
-	public ColeccionUsuarios() {
-        usuarios = new Hashtable<>();
-    }
-	
-	public void agregarUsuario(Usuario u) {
-        usuarios.put(u.getId(), u);
-    }
-	
-	public Usuario obtenerUsuario(int id) {
-        return usuarios.get(id);
+    private ArrayList<Usuario> usuarios;
+
+    public ColeccionUsuarios() {
+        usuarios = new ArrayList<>();
     }
 
-    public boolean pertenece(int id) {
-        return usuarios.containsKey(id);
-    }
-
-    public Hashtable<Integer, Usuario> getUsuarios() {
-        return usuarios;
+    public void agregarUsuario(Usuario u) {
+        if (!pertenece(u.getId())) {
+            usuarios.add(u);
+        }
     }
     
-    /*Se usa Hashtable ya que necesitamos buscar usuarios por ID rápidamente (tiempo constante), 
-    evitando duplicados.*/
-	
+	public void eliminarUsuario(int id) {
+	    for (int i = 0; i < usuarios.size(); i++) {
+	        if (usuarios.get(i).getId() == id) {
+	            usuarios.remove(i);
+	        }
+	    }
+	}
+
+    public Usuario obtenerUsuario(int id) {
+    	Usuario encontrado = new Usuario();
+        for (int i = 0; i < usuarios.size(); i++) {
+            if (usuarios.get(i).getId() == id) {
+                encontrado = usuarios.get(i);
+            }
+        }
+        return encontrado;
+    }
+
+    public int largo() {
+        return usuarios.size();
+    }
+    
+    public boolean vacia() {
+        return usuarios.isEmpty();
+    }
+    
+    public boolean pertenece(int id) {
+    	boolean esta = false;
+        for (int i = 0; i < usuarios.size(); i++) {
+            if (usuarios.get(i).getId() == id) {
+                esta = true;
+            }
+        }
+        return esta;
+    }
+
+    public ArrayList<Usuario> getUsuarios() {
+        return usuarios;
+    }
 }

@@ -15,15 +15,25 @@ public class ColeccionPrestamos {
 		 prestamos.add(p);
 	}
 	
-    // Elimina un préstamo específico (por objeto exacto)
-    public void eliminar(Prestamo p) {
-        prestamos.remove(p);
-    }
+    // Elimina un préstamo por la ID del libro
+	public void eliminar(int idLibro) {
+	    for (int i = 0; i < prestamos.size(); i++) {
+	        if (prestamos.get(i).getIdLibro() == idLibro) {
+	            prestamos.remove(i);
+	        }
+	    }
+	}
+	
+	   public Prestamo obtenerPrestamo(int id) {
+	    	Prestamo encontrado = new Prestamo();
+	        for (int i = 0; i < prestamos.size(); i++) {
+	            if (prestamos.get(i).getIdLibro() == id) {
+	                encontrado = prestamos.get(i);
+	            }
+	        }
+	        return encontrado;
+	    }
 		
-    // Devuelve todos los préstamos
-    public ArrayList<Prestamo> obtenerTodos() {
-        return prestamos;
-    }
 
     // Devuelve la cantidad total de préstamos
     public int largo() {
@@ -33,6 +43,21 @@ public class ColeccionPrestamos {
     // Verifica si la colección de préstamos está vacía
     public boolean vacia() {
         return prestamos.isEmpty();
+    }
+    
+    public boolean pertenece(int id) {
+    	boolean esta = false;
+        for (int i = 0; i < prestamos.size(); i++) {
+            if (prestamos.get(i).getIdLibro() == id) {
+                esta = true;
+            }
+        }
+        return esta;
+    }
+    
+    // Devuelve todos los préstamos
+    public ArrayList<Prestamo> getPrestamos() {
+        return prestamos;
     }
 	
 }
