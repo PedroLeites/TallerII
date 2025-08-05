@@ -10,6 +10,8 @@ public class DatosVista extends JFrame {
 	private DefaultTableModel modeloTabla;
 	private JButton btnCargar = new JButton("Cargar datos");
 	private JButton btnEnviar = new JButton("Enviar correo");
+	private JTextField campoBuscarID = new JTextField(10);
+	private JButton btnBuscarPorID = new JButton("Buscar por ID");
 	JPanel panelBotones = new JPanel();
 	
 	public DatosVista() {
@@ -30,6 +32,10 @@ public class DatosVista extends JFrame {
         panelBotones.add(btnCargar);
         panelBotones.add(btnEnviar);
         
+        panelBotones.add(new JLabel("ID Usuario:"));
+        panelBotones.add(campoBuscarID);
+        panelBotones.add(btnBuscarPorID);
+        
         this.add(panelBotones, BorderLayout.SOUTH);
         
         this.setSize(1000, 600);
@@ -40,6 +46,7 @@ public class DatosVista extends JFrame {
 	//Este método asocia un ActionListener al botón btnCargar.
 	public void setControladorDatos(ActionListener al) { 
 		btnCargar.addActionListener(al); 
+		btnBuscarPorID.addActionListener(al);
 	}
 	
 	public void setControladorCorreo(ActionListener al) {
@@ -69,6 +76,23 @@ public class DatosVista extends JFrame {
             datos[i] = modeloTabla.getValueAt(fila, i);
         }
         return datos;
+    }
+    
+    public int getIDUsuarioBuscado() {
+        try {
+            return Integer.parseInt(campoBuscarID.getText().trim());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+    
+ // GETTERS PARA RECONOCER EL BOTÓN DESDE EL CONTROLADOR
+    public JButton getBotonCargar() {
+        return btnCargar;
+    }
+
+    public JButton getBotonBuscarPorID() {
+        return btnBuscarPorID;
     }
     
 }
