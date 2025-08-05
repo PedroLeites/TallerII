@@ -1,6 +1,9 @@
 package controlador;
 
-import modelo.ServicioDeCorreo;
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.util.Properties;
+
 import modelo.Correo;
 import vista.DatosVista;
 
@@ -8,17 +11,46 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 
-public class CorreoControlador implements ActionListener {
-	private DatosVista vista;
-	private ServicioDeCorreo servicio;
-
-	public CorreoControlador(DatosVista vista) {
+public class ManejadoraDeCorreos implements ActionListener {
+	private final String remitente = "leitespedro2004@gmail.com";
+    private final String contraseña = "ymcb uzco roas xppx";
+    private DatosVista vista;
+    
+    public ManejadoraDeCorreos(DatosVista vista) {
         this.vista = vista;
-        this.servicio = new ServicioDeCorreo();
         this.vista.setControladorCorreo(this);
     }
-	
-	@Override
+    
+    public boolean enviar(Correo correo) {
+    	boolean seMando = false;
+    	Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session sesion = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(remitente, contraseña);
+            }
+        });
+        
+        try {
+            Message mensaje = new MimeMessage(sesion);
+            mensaje.setFrom(new InternetAddress(remitente));
+            mensaje.setRecipients(Message.RecipientType.TO, InternetAddress.parse(correo.getDestinatario()));
+            mensaje.setSubject(correo.getAsunto());
+            mensaje.setText(correo.getCuerpo());
+
+            Transport.send(mensaje);
+            seMando = true;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+        return seMando;
+    }
+    
+    @Override
     public void actionPerformed(ActionEvent e) {
         Object[] datos = vista.getDatosFilaSeleccionada();
         if (datos == null) {
@@ -42,7 +74,7 @@ public class CorreoControlador implements ActionListener {
                 + "Saludos cordiales,\nBiblioteca INET";
 
         Correo correo = new Correo(correoDestino, asunto, cuerpo);
-        boolean enviado = servicio.enviar(correo);
+        boolean enviado = enviar(correo);
 
         if (enviado) {
             JOptionPane.showMessageDialog(null, "Correo enviado correctamente");
@@ -50,8 +82,5 @@ public class CorreoControlador implements ActionListener {
             JOptionPane.showMessageDialog(null, "Error al enviar correo");
         }
     }
-
-    public boolean enviarCorreo(Correo correo) {
-        return servicio.enviar(correo);
-    }
+    
 }

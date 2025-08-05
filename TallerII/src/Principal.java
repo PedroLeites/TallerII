@@ -1,14 +1,14 @@
 import vista.DatosVista;
-import controlador.DatosControlador;
-import controlador.CorreoControlador;
+import controlador.ManejadoraDeDatos;
+import controlador.ManejadoraDeCorreos;
 import javax.swing.SwingUtilities;
 
 public class Principal {
 	public static void main(String[] args) {
 		
 		DatosVista ventana = new DatosVista();
-		DatosControlador controladorVentana = new DatosControlador(ventana);
-		CorreoControlador controladorMails = new CorreoControlador(ventana);
+		ManejadoraDeDatos controladorVentana = new ManejadoraDeDatos(ventana);
+		ManejadoraDeCorreos controladorMails = new ManejadoraDeCorreos(ventana);
 		ventana.setVisible(true);
 		
 		/*

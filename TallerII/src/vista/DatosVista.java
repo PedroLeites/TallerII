@@ -5,9 +5,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-import controlador.CorreoControlador;
-import modelo.Correo;
-
 public class DatosVista extends JFrame {
 	private JTable tabla;
 	private DefaultTableModel modeloTabla;

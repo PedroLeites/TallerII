@@ -1,21 +1,34 @@
-package modelo;
+package controlador;
 
 import java.io.FileInputStream;
 import jxl.Sheet;
 import jxl.Workbook;
+
+import modelo.ColeccionUsuarios;
+import modelo.Datos;
+import modelo.Prestamo;
+import modelo.Usuario;
+
+import vista.DatosVista;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-//Establece el vínculo entre datos y arrmar al usuario, prestamos, etc
-public class ManejadoraDeDatos {
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
+
+public class ManejadoraDeDatos implements ActionListener {
 	private Datos datos;
     private ColeccionUsuarios usuarios;
+    private DatosVista vista;
     
-    public ManejadoraDeDatos() {
-        datos = new Datos();
-        usuarios = new ColeccionUsuarios();
-        importarDatos();
+    public ManejadoraDeDatos(DatosVista vista) {
+    	this.vista = vista;
+        this.datos = new Datos();
+        this.usuarios = new ColeccionUsuarios();
+        this.vista.setControladorDatos(this);
     }
     
     private void importarDatos() {
@@ -83,6 +96,29 @@ public class ManejadoraDeDatos {
             System.out.println("Error al calcular días de retraso: " + e.getMessage());
             return 0;
         }
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        vista.limpiarTabla();
+        importarDatos();
+
+        for (Usuario usuario : usuarios.getUsuarios().values()) {
+            for (Prestamo prestamo : usuario.getPrestamos().obtenerTodos()) {
+                vista.agregarFila(new Object[]{
+                        prestamo.getFechaPrestamo(),
+                        prestamo.getFechaDevolucionPrevista(),
+                        prestamo.getDiasRetraso(),
+                        usuario.getId(),
+                        usuario.getNombreCompleto(),
+                        usuario.getCorreo(),
+                        prestamo.getTituloLibro(),
+                        prestamo.getIdLibro()
+                });
+            }
+        }
+
+        JOptionPane.showMessageDialog(vista, "Datos cargados exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
     
