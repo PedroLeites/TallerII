@@ -1,8 +1,8 @@
 package modelo;
 
 public class Prestamo {
-    private String fechaPrestamo; //aff_pret_date
-    private String fechaDevolucionPrevista; //aff_pret_retour
+    private Fecha fechaPrestamo; //aff_pret_date
+    private Fecha fechaDevolucionPrevista; //aff_pret_retour
     private int diasRetraso; //calcular con los atributos anteriores
     private int idLibro; //expl_cb
     private String tituloLibro; //tit
@@ -11,7 +11,7 @@ public class Prestamo {
     	
     }
 
-    public Prestamo(String fechaPrestamo, String fechaDevolucion, int diasRetraso, int idLibro, String tituloLibro) {
+    public Prestamo(Fecha fechaPrestamo, Fecha fechaDevolucion, int diasRetraso, int idLibro, String tituloLibro) {
         this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucionPrevista = fechaDevolucion;
         this.diasRetraso = diasRetraso;
@@ -20,19 +20,19 @@ public class Prestamo {
     }
 
     // Getters y Setters
-    public String getFechaPrestamo() {
+    public Fecha getFechaPrestamo() {
         return fechaPrestamo;
     }
 
-    public void setFechaPrestamo(String fechaPrestamo) {
+    public void setFechaPrestamo(Fecha fechaPrestamo) {
         this.fechaPrestamo = fechaPrestamo;
     }
 
-    public String getFechaDevolucionPrevista() {
+    public Fecha getFechaDevolucionPrevista() {
         return fechaDevolucionPrevista;
     }
 
-    public void setFechaDevolucionPrevista(String fechaDevolucionPrevista) {
+    public void setFechaDevolucionPrevista(Fecha fechaDevolucionPrevista) {
         this.fechaDevolucionPrevista = fechaDevolucionPrevista;
     }
 

@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import jxl.Sheet;
 import jxl.Workbook;
 
+import modelo.Fecha;
 import modelo.ColeccionUsuarios;
 import modelo.Datos;
 import modelo.Prestamo;
@@ -38,9 +39,9 @@ public class ManejadoraDeDatos implements ActionListener {
             
             for (int i = 3; i < hoja.getRows(); i++) {
             	//Fechas del préstamo
-            	String fechaPrestamo = hoja.getCell(0, i).getContents().trim();
-                String fechaDevolucion = hoja.getCell(1, i).getContents().trim();
-                int diasRetraso = calcularDiasRetraso(fechaPrestamo, fechaDevolucion);
+            	Fecha fechaPrestamo = new Fecha(hoja.getCell(0, i).getContents().trim());
+            	Fecha fechaDevolucion = new Fecha(hoja.getCell(1, i).getContents().trim());
+            	int diasRetraso = calcularDiasRetraso(fechaPrestamo, fechaDevolucion);
                 
                 //Datos del usuario
                 int idUsuario = Integer.parseInt(hoja.getCell(3, i).getContents().trim());
@@ -79,23 +80,16 @@ public class ManejadoraDeDatos implements ActionListener {
         return datos;
     }
     
-    private int calcularDiasRetraso(String fechaPStr, String fechaDPStr) {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy"); //Formato de la fecha en el archivo
-            LocalDate fechaPrestamo = LocalDate.parse(fechaPStr, formatter); //Formateamos la fecha de String a LocalDate
-            LocalDate fechaDevolucionPrevista = LocalDate.parse(fechaDPStr, formatter); //Formateamos la fecha de String a LocalDate
-            LocalDate hoy = LocalDate.now(); //Fecha actual
+    private int calcularDiasRetraso(Fecha fechaPrestamo, Fecha fechaDevolucionPrevista) {
+    	Fecha hoy = new Fecha(java.time.LocalDate.now().getDayOfMonth(),
+                java.time.LocalDate.now().getMonthValue(),
+                java.time.LocalDate.now().getYear());
 
-            // Si la devolución era para el pasado y todavía no se devolvió, se calcula el atraso.
-            if (hoy.isAfter(fechaDevolucionPrevista)) {
-                return (int) ChronoUnit.DAYS.between(fechaDevolucionPrevista, hoy);
-            } else {
-                return 0;
-            }
-        } catch (Exception e) {
-            System.out.println("Error al calcular días de retraso: " + e.getMessage());
-            return 0;
-        }
+    	if (hoy.toLocalDate().isAfter(fechaDevolucionPrevista.toLocalDate())) {
+    		return Fecha.diasEntre(fechaDevolucionPrevista, hoy);
+    	}
+    	
+    	return 0;
     }
     
     @Override
@@ -106,8 +100,8 @@ public class ManejadoraDeDatos implements ActionListener {
         for (Usuario usuario : usuarios.getUsuarios().values()) {
             for (Prestamo prestamo : usuario.getPrestamos().obtenerTodos()) {
                 vista.agregarFila(new Object[]{
-                        prestamo.getFechaPrestamo(),
-                        prestamo.getFechaDevolucionPrevista(),
+                        prestamo.getFechaPrestamo().toString(),
+                        prestamo.getFechaDevolucionPrevista().toString(),
                         prestamo.getDiasRetraso(),
                         usuario.getId(),
                         usuario.getNombreCompleto(),
