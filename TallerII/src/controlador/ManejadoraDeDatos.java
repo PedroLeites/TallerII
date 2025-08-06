@@ -40,6 +40,8 @@ public class ManejadoraDeDatos implements ActionListener {
     }
     
     private void procesarCadena() {
+    	usuarios = new ColeccionUsuarios(); // Reiniciar la colección de usuarios si ya se había cargado antes
+    	
         // Obtenemos el contenido crudo del archivo Excel como una sola cadena
         String contenido = datos.getCadena();
 
