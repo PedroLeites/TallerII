@@ -38,7 +38,21 @@ public class ManejadoraDeCorreos implements ActionListener {
         try {
             Message mensaje = new MimeMessage(sesion);
             mensaje.setFrom(new InternetAddress(remitente));
-            mensaje.setRecipients(Message.RecipientType.TO, InternetAddress.parse(correo.getDestinatario()));
+            //mensaje.setRecipients(Message.RecipientType.TO, InternetAddress.parse(correo.getDestinatario()));
+            
+            String[] correos = correo.getDestinatario().split("\\s+");
+            InternetAddress[] direcciones = new InternetAddress[correos.length];
+
+            for (int i = 0; i < correos.length; i++) {
+                if (!correos[i].matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+                    System.out.println("Correo inválido: " + correos[i]);
+                    continue; 
+                }
+                direcciones[i] = new InternetAddress(correos[i]);
+            }
+
+            mensaje.setRecipients(Message.RecipientType.TO, direcciones);
+            
             mensaje.setSubject(correo.getAsunto());
             mensaje.setText(correo.getCuerpo());
 
