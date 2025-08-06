@@ -23,12 +23,15 @@ public class ManejadoraDeCorreos implements ActionListener {
     
     public boolean enviar(Correo correo) {
     	boolean seMando = false;
+    	
+    	// Configuración para conectarse al servidor SMTP de Gmail
     	Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
 
+        // Crear la sesión con autenticación del remitente
         Session sesion = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(remitente, contraseña);
@@ -36,36 +39,44 @@ public class ManejadoraDeCorreos implements ActionListener {
         });
         
         try {
+        	 // Crear mensaje de correo
             Message mensaje = new MimeMessage(sesion);
             mensaje.setFrom(new InternetAddress(remitente));
             //mensaje.setRecipients(Message.RecipientType.TO, InternetAddress.parse(correo.getDestinatario()));
             
+         //Procesar múltiples destinatarios por si aparece más de un mail en la celda
             String[] correos = correo.getDestinatario().split("\\s+");
             InternetAddress[] direcciones = new InternetAddress[correos.length];
 
             for (int i = 0; i < correos.length; i++) {
+            	// Validar que sea una dirección de correo válida
                 if (!correos[i].matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
                     System.out.println("Correo inválido: " + correos[i]);
-                    continue; 
+                    continue; // Salta correos inválidos
                 }
                 direcciones[i] = new InternetAddress(correos[i]);
             }
 
+         // Setear los destinatarios del correo
             mensaje.setRecipients(Message.RecipientType.TO, direcciones);
             
+         // Asunto y cuerpo del mensaje
             mensaje.setSubject(correo.getAsunto());
             mensaje.setText(correo.getCuerpo());
 
+            // Enviar el mensaje
             Transport.send(mensaje);
             seMando = true;
+            
         } catch (MessagingException e) {
             e.printStackTrace();
         }
         return seMando;
     }
     
+    
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) { // Este método se ejecuta cuando se hace clic en el botón de "Enviar correo"
         Object[] datos = vista.getDatosFilaSeleccionada();
         if (datos == null) {
             JOptionPane.showMessageDialog(null, "Selecciona una fila primero.");
