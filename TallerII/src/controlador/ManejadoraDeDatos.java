@@ -68,7 +68,7 @@ public class ManejadoraDeDatos implements ActionListener {
                 // Interpretamos las fechas
                 Fecha fechaPrestamo = new Fecha(celdas[0].trim());
                 Fecha fechaDevolucion = new Fecha(celdas[1].trim());
-                int diasRetraso = calcularDiasRetraso(fechaPrestamo, fechaDevolucion);
+                long diasRetraso = calcularDiasRetraso(fechaPrestamo, fechaDevolucion);
 
                 // Datos del usuario
                 int idUsuario = (int) Double.parseDouble(celdas[3].trim());
@@ -163,7 +163,7 @@ public class ManejadoraDeDatos implements ActionListener {
     }
     
 
-    private int calcularDiasRetraso(Fecha fechaPrestamo, Fecha fechaDevolucionPrevista) {
+    private long calcularDiasRetraso(Fecha fechaPrestamo, Fecha fechaDevolucionPrevista) {
     	Fecha hoy = new Fecha(java.time.LocalDate.now().getDayOfMonth(),
                 java.time.LocalDate.now().getMonthValue(),
                 java.time.LocalDate.now().getYear());
