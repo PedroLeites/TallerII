@@ -48,6 +48,14 @@ public class ColeccionUsuarios {
         }
         return encontrado;
     }
+    
+    public Usuario obtenerUsuarioPorPosicion(int posicion) {
+        if (posicion >= 0 && posicion < usuarios.size()) {
+            return usuarios.get(posicion);
+        } else {
+            return null;
+        }
+    }
 
     //Devuelve el total de usuarios de la colección
     public int largo() {

@@ -1,42 +1,24 @@
 package controlador;
 
-//Para JExcelAPI
-import java.io.FileInputStream;
-import jxl.Sheet;
-import jxl.Workbook;
-
-//Para Apache POI
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import modelo.Fecha;
-import modelo.ColeccionUsuarios;
-import modelo.ColeccionPrestamos;
-import java.util.ArrayList;
-import modelo.Datos;
 import modelo.Prestamo;
+import modelo.ColeccionPrestamos;
 import modelo.Usuario;
+import modelo.ColeccionUsuarios;
+import modelo.Datos;
 
-import vista.DatosVista;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JOptionPane;
-
-public class ManejadoraDeDatos implements ActionListener {
+public class ManejadoraDeDatos {
 	private Datos datos;
     private ColeccionUsuarios usuarios;
-    private DatosVista vista;
     
-    public ManejadoraDeDatos(DatosVista vista) {
-    	this.vista = vista;
-        this.datos = new Datos();
+    public ManejadoraDeDatos() {
+    	this.datos = new Datos();
+    	this.usuarios = new ColeccionUsuarios();
+    }
+    
+    public ManejadoraDeDatos(Datos d) {
+        this.datos = d;
         this.usuarios = new ColeccionUsuarios();
-        this.vista.setControladorDatos(this);
     }
     
     private void procesarCadena() {
@@ -106,201 +88,132 @@ public class ManejadoraDeDatos implements ActionListener {
         // Imprimir cuántos usuarios se importaron al final
         System.out.println("Total de usuarios importados: " + usuarios.largo());
     }
-   
-   private void mostrarTodosLosPrestamos() {
-        ArrayList<Usuario> listaUsuarios = usuarios.getUsuarios();
+    
+    public void cargarDatos() {
+        procesarCadena();
+    }
+    
+    public String mostrarTodosLosPrestamos() {
+        if (this.usuarios == null || this.usuarios.vacia()) {
+            return "No hay datos cargados.";
+        }
+        String ls = System.lineSeparator();
+        StringBuilder sb = new StringBuilder();
+        sb.append("ColeccionUsuarios {total=").append(this.usuarios.largo()).append("}").append(ls);
 
-        for (Usuario usuario : listaUsuarios) {
-            ArrayList<Prestamo> listaPrestamos = usuario.getPrestamosDeUsuario().getPrestamos();
-
-            for (Prestamo prestamo : listaPrestamos) {
-                vista.agregarFila(new Object[]{
-                    prestamo.getFechaPrestamo().toString(),
-                    prestamo.getFechaDevolucionPrevista().toString(),
-                    prestamo.getDiasRetraso(),
-                    usuario.getId(),
-                    usuario.getNombreCompleto(),
-                    usuario.getCorreo(),
-                    prestamo.getTituloLibro(),
-                    prestamo.getIdLibro()
-                });
+        java.util.ArrayList<Usuario> lista = this.usuarios.getUsuarios();
+        for (int i = 0; i < lista.size(); i++) {
+            Usuario u = lista.get(i);
+            if (u != null) {
+                sb.append("Usuario ").append(u.getId())
+                  .append(" - ").append(u.getNombreCompleto())
+                  .append(" <").append(u.getCorreo()).append(">").append(ls);
+                sb.append(u.getPrestamosDeUsuario().toString()).append(ls).append(ls);
             }
         }
+        return sb.toString();
     }
     
-    public void mostrarPrestamosDeUsuario(int idUsuario) {
-    	/*if (usuarios.vacia()) {
-    	    JOptionPane.showMessageDialog(vista, "Primero cargá los datos.", "Aviso", JOptionPane.WARNING_MESSAGE);
-    	    return;
-    	}*/
-    	
-    	if (usuarios.vacia()) {
-    	    procesarCadena();
-    	}
-    	
-        vista.limpiarTabla();
-
-        if (!usuarios.pertenece(idUsuario)) {
-            JOptionPane.showMessageDialog(vista, "No existe un usuario con ese ID.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+    public String mostrarPrestamosDeUsuario(int idUsuario) {
+        Usuario u = obtenerUsuarioPorId(idUsuario);
+        if (u == null) {
+            return "No existe un usuario con ese ID o no hay datos cargados.";
         }
-
-        Usuario usuario = usuarios.obtenerUsuario(idUsuario);
-        ArrayList<Prestamo> listaPrestamos = usuario.getPrestamosDeUsuario().getPrestamos();
-
-        for (Prestamo prestamo : listaPrestamos) {
-            vista.agregarFila(new Object[]{
-                prestamo.getFechaPrestamo().toString(),
-                prestamo.getFechaDevolucionPrevista().toString(),
-                prestamo.getDiasRetraso(),
-                usuario.getId(),
-                usuario.getNombreCompleto(),
-                usuario.getCorreo(),
-                prestamo.getTituloLibro(),
-                prestamo.getIdLibro()
-            });
-        }
+        String ls = System.lineSeparator();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Usuario ").append(u.getId())
+          .append(" - ").append(u.getNombreCompleto())
+          .append(" <").append(u.getCorreo()).append(">").append(ls);
+        sb.append(u.getPrestamosDeUsuario().toString());
+        return sb.toString();
     }
     
-
     private long calcularDiasRetraso(Fecha fechaPrestamo, Fecha fechaDevolucionPrevista) {
+    	long dias = 0;
     	Fecha hoy = new Fecha(java.time.LocalDate.now().getDayOfMonth(),
                 java.time.LocalDate.now().getMonthValue(),
                 java.time.LocalDate.now().getYear());
 
     	if (hoy.toLocalDate().isAfter(fechaDevolucionPrevista.toLocalDate())) {
-    		return Fecha.diasEntre(fechaDevolucionPrevista, hoy);
+    		dias = Fecha.diasEntre(fechaDevolucionPrevista, hoy);
     	}
     	
-    	return 0;
+    	return dias;
+    }
+
+    public ColeccionUsuarios obtenerUsuarios() {
+        return usuarios;
     }
     
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object fuente = e.getSource();
-
-        if (fuente == vista.getBotonCargar()) {
-            vista.limpiarTabla();
-            procesarCadena();
-            mostrarTodosLosPrestamos();
-            JOptionPane.showMessageDialog(vista, "Datos cargados exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        }
-
-        if (fuente == vista.getBotonBuscarPorID()) {
-            int idBuscado = vista.getIDUsuarioBuscado();
-            if (idBuscado == -1) {
-                JOptionPane.showMessageDialog(vista, "Ingrese un ID válido", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-            	System.out.println("==== DEBUG ====");
-            	System.out.println("ID ingresado por el usuario: " + idBuscado);
-            	System.out.println("Usuarios en memoria:");
-            	for (Usuario u : usuarios.getUsuarios()) {
-            	    System.out.println("ID: " + u.getId() + " - Nombre: " + u.getNombreCompleto());
-            	}
-            	System.out.println("===============");
-                mostrarPrestamosDeUsuario(idBuscado);
-            }
-        }
+    public Usuario obtenerUsuarioPorId(int id) {
+    	return usuarios.obtenerUsuario(id);
     }
-
-    public ColeccionUsuarios getUsuarios() {
-        return usuarios;
+    
+    public ColeccionPrestamos obtenerPrestamosDeUsuario(int idUsuario) {
+        Usuario u = obtenerUsuarioPorId(idUsuario);
+        if (u == null) {
+            return null;
+        }
+        return u.getPrestamosDeUsuario();
     }
 
     public Datos getDatos() {
         return datos;
     }
     
-    /*private void importarDatos() {
-	String rutaArchivo = datos.getRuta();
-	
-	try {
-		if (rutaArchivo.endsWith(".xls")) {
-    		//con JExcelAPI 
-			Workbook libro = Workbook.getWorkbook(new FileInputStream(datos.getRuta()));
-            Sheet hoja = libro.getSheet(0);
-            
-            for (int i = 3; i < hoja.getRows(); i++) {
-            	//Fechas del préstamo
-            	Fecha fechaPrestamo = new Fecha(hoja.getCell(0, i).getContents().trim());  // aff_pret_date
-                Fecha fechaDevolucion = new Fecha(hoja.getCell(1, i).getContents().trim()); // aff_pret_retour
-                int diasRetraso = calcularDiasRetraso(fechaPrestamo, fechaDevolucion);
-                
-                //Datos del usuario
-                int idUsuario = Integer.parseInt(hoja.getCell(3, i).getContents().trim()); // primer id_empr
-                String apellido = hoja.getCell(4, i).getContents().trim();  // empr_nom
-                String nombre = hoja.getCell(5, i).getContents().trim();   // empr_prenom
-                String correo = hoja.getCell(6, i).getContents().trim();   // empr_mail
-                int ci = Integer.parseInt(hoja.getCell(8, i).getContents().trim()); // empr_cb
-                
-                //Datos del libro
-                int idLibro = Integer.parseInt(hoja.getCell(10, i).getContents().trim()); // expl_cb
-                String titulo = hoja.getCell(14, i).getContents().trim(); // tit
-                
-                Prestamo prestamo = new Prestamo(fechaPrestamo, fechaDevolucion, diasRetraso, idLibro, titulo);
-                
-                Usuario usuario;
-                if (usuarios.pertenece(idUsuario)) {
-                    usuario = usuarios.obtenerUsuario(idUsuario);
-                } else {
-                    usuario = new Usuario(idUsuario, ci, nombre, apellido, correo);
-                    System.out.println("Importando usuario ID: " + idUsuario + " - " + nombre + " " + apellido);
-                    usuarios.agregarUsuario(usuario);
-                    System.out.println("Total de usuarios: " + usuarios.largo());
-                }
+}
 
-                usuario.agregarPrestamo(prestamo);
-            }
-            libro.close();
-            
-    	}else if(rutaArchivo.endsWith(".xlsx")) {
-    		//con Apache POI
-    		java.io.FileInputStream fis = new java.io.FileInputStream(rutaArchivo);
-    		org.apache.poi.ss.usermodel.Workbook libro = new org.apache.poi.xssf.usermodel.XSSFWorkbook(fis);
-    		org.apache.poi.ss.usermodel.Sheet hoja = libro.getSheetAt(0);
+/*private void mostrarTodosLosPrestamos() {
+ArrayList<Usuario> listaUsuarios = usuarios.getUsuarios();
 
-            for (int i = 3; i <= hoja.getLastRowNum(); i++) {
-                Row fila = hoja.getRow(i);
-                if (fila == null) continue;
+for (Usuario usuario : listaUsuarios) {
+    ArrayList<Prestamo> listaPrestamos = usuario.getPrestamosDeUsuario().getPrestamos();
 
-                String fechaPrestamoStr = fila.getCell(0).toString().trim();
-                String fechaDevolucionStr = fila.getCell(1).toString().trim();
-                
-                int idUsuario = (int) Double.parseDouble(fila.getCell(3).toString().trim());
-                String apellido = fila.getCell(4).toString().trim();
-                String nombre = fila.getCell(5).toString().trim();
-                String correo = fila.getCell(6).toString().trim();
-                int ci = (int) Double.parseDouble(fila.getCell(8).toString().trim());
-                int idLibro = (int) Double.parseDouble(fila.getCell(10).toString().trim());
-                String titulo = fila.getCell(14).toString().trim();
-
-                Fecha fechaPrestamo = new Fecha(fechaPrestamoStr);
-                Fecha fechaDevolucion = new Fecha(fechaDevolucionStr);
-                int diasRetraso = calcularDiasRetraso(fechaPrestamo, fechaDevolucion);
-
-                Prestamo prestamo = new Prestamo(fechaPrestamo, fechaDevolucion, diasRetraso, idLibro, titulo);
-
-                Usuario usuario;
-                if (usuarios.pertenece(idUsuario)) {
-                    usuario = usuarios.obtenerUsuario(idUsuario);
-                } else {
-                    usuario = new Usuario(idUsuario, ci, nombre, apellido, correo);
-                    System.out.println("Importando usuario ID: " + idUsuario + " - " + nombre + " " + apellido);
-                    usuarios.agregarUsuario(usuario);
-                    System.out.println("Total de usuarios: " + usuarios.largo());
-                }
-
-                usuario.agregarPrestamo(prestamo);
-            }
-
-            libro.close();
-            fis.close();
-    	}
-		
-	}catch (Exception e) {
-		System.out.println("Error al importar datos: " + e.getMessage());
-	}
+    for (Prestamo prestamo : listaPrestamos) {
+        vista.agregarFila(new Object[]{
+            prestamo.getFechaPrestamo().toString(),
+            prestamo.getFechaDevolucionPrevista().toString(),
+            prestamo.getDiasRetraso(),
+            usuario.getId(),
+            usuario.getNombreCompleto(),
+            usuario.getCorreo(),
+            prestamo.getTituloLibro(),
+            prestamo.getIdLibro()
+        });
+    }
+}
 }*/
 
-    
-}
+/*public void mostrarPrestamosDeUsuario(int idUsuario) {
+	//if (usuarios.vacia()) {
+	    //JOptionPane.showMessageDialog(vista, "Primero cargá los datos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+	    //return;
+	//}
+	
+	if (usuarios.vacia()) {
+	    procesarCadena();
+	}
+	
+    vista.limpiarTabla();
+
+    if (!usuarios.pertenece(idUsuario)) {
+        JOptionPane.showMessageDialog(vista, "No existe un usuario con ese ID.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    Usuario usuario = usuarios.obtenerUsuario(idUsuario);
+    ArrayList<Prestamo> listaPrestamos = usuario.getPrestamosDeUsuario().getPrestamos();
+
+    for (Prestamo prestamo : listaPrestamos) {
+        vista.agregarFila(new Object[]{
+            prestamo.getFechaPrestamo().toString(),
+            prestamo.getFechaDevolucionPrevista().toString(),
+            prestamo.getDiasRetraso(),
+            usuario.getId(),
+            usuario.getNombreCompleto(),
+            usuario.getCorreo(),
+            prestamo.getTituloLibro(),
+            prestamo.getIdLibro()
+        });
+    }
+}*/

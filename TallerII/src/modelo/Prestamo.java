@@ -51,7 +51,7 @@ public class Prestamo {
         return diasRetraso;
     }
 
-    public void setDiasRetraso(int diasRetraso) {
+    public void setDiasRetraso(long diasRetraso) {
         this.diasRetraso = diasRetraso;
     }
     

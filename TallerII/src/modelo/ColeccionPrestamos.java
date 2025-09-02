@@ -46,6 +46,14 @@ public class ColeccionPrestamos {
 		}
 		return encontrado;
 	}
+	
+    public Prestamo obtenerPrestamoPorPosicion(int posicion) {
+        if (posicion >= 0 && posicion < prestamos.size()) {
+            return prestamos.get(posicion);
+        } else {
+            return null;
+        }
+    }
 		
     //Devuelve la cantidad total de préstamos
     public int largo() {

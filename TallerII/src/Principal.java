@@ -7,8 +7,8 @@ public class Principal {
 	public static void main(String[] args) {
 		
 		DatosVista ventana = new DatosVista();
-		ManejadoraDeDatos controladorVentana = new ManejadoraDeDatos(ventana);
-		ManejadoraDeCorreos controladorMails = new ManejadoraDeCorreos(ventana);
+		ManejadoraDeDatos controladorDatos = new ManejadoraDeDatos();
+		ventana.setControladorDatos(controladorDatos);
 		ventana.setVisible(true);
 		
 		/*
