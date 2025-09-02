@@ -7,10 +7,12 @@ public class Prestamo {
     private int idLibro; //expl_cb
     private String tituloLibro; //tit
 
+    //Constructor común
     public Prestamo() {
     	
     }
 
+    //Constructor específico
     public Prestamo(Fecha fechaPrestamo, Fecha fechaDevolucion, int diasRetraso, int idLibro, String tituloLibro) {
         this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucionPrevista = fechaDevolucion;
@@ -19,6 +21,7 @@ public class Prestamo {
         this.tituloLibro = tituloLibro;
     }
     
+    //Constructor de copia
     public Prestamo(Prestamo p) {
         this.fechaPrestamo = p.fechaPrestamo;
         this.fechaDevolucionPrevista = p.fechaDevolucionPrevista;
@@ -68,6 +71,7 @@ public class Prestamo {
 		this.tituloLibro = tituloLibro;
 	}
 
+	//toString
 	@Override
 	public String toString() {
 		return "Prestamo [fechaPrestamo=" + fechaPrestamo + ", fechaDevolucionPrevista=" + fechaDevolucionPrevista

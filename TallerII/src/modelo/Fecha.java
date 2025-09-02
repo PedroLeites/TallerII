@@ -42,6 +42,7 @@ public class Fecha {
         }
     }
 
+	//Getters y Setters
 	public int getDia() {
 		return dia;
 	}
@@ -66,6 +67,7 @@ public class Fecha {
 		this.anio = anio;
 	}
 	
+	//Métodos específicos
 	public LocalDate toLocalDate() {
         return LocalDate.of(anio, mes, dia);
     }
@@ -79,6 +81,7 @@ public class Fecha {
     	return dias;
     }
     
+    //toString
     @Override
     public String toString() {
         return String.format("%02d/%02d/%04d", dia, mes, anio);
