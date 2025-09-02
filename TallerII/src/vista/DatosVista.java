@@ -11,8 +11,6 @@ import modelo.Prestamo;
 import modelo.ColeccionUsuarios;
 import modelo.ColeccionPrestamos;
 
-import java.util.ArrayList;
-
 public class DatosVista extends JFrame {
 	private ManejadoraDeDatos controlador;
 	private JTable tabla;
@@ -54,6 +52,7 @@ public class DatosVista extends JFrame {
 	
 	public void setControladorDatos(ManejadoraDeDatos controlador) { 
 		this.controlador = controlador;
+		
 		this.btnCargar.addActionListener(e -> {
 			try {
 				limpiarTabla();
@@ -63,7 +62,6 @@ public class DatosVista extends JFrame {
 				if(cu == null || cu.vacia()) {
 					mostrarInfo("No se encontraron préstamos para mostrar.");
 				}else {
-					//ArrayList<Usuario> listaU = cu.getUsuarios();
 					for(int i = 0; i < cu.largo(); i++) {
 						Usuario u = cu.obtenerUsuarioPorPosicion(i);
 						ColeccionPrestamos cp = u.getPrestamosDeUsuario();
@@ -78,16 +76,55 @@ public class DatosVista extends JFrame {
 				mostrarError("Error al cargar los datos: " + ex.getMessage());
 			}
 		});
+		
+		this.btnBuscarPorID.addActionListener(e-> {
+			int id = getIDUsuarioBuscado();
+			if (id <= -1) {
+		        mostrarError("Ingrese un ID válido.");
+		        return;
+		    }
+
+		    //Verifica si los datos ya están cargados
+		    modelo.ColeccionUsuarios cu = this.controlador.obtenerUsuarios();
+		    if (cu == null || cu.vacia()) {
+		        try {
+		            this.controlador.cargarDatos();           //intenta cargar
+		            cu = this.controlador.obtenerUsuarios();  //carga a los usuarios en memoria
+		            if (cu == null || cu.vacia()) {
+		                mostrarInfo("Datos no cargados. Verifique la ruta del archivo y vuelva a intentar.");
+		                return;
+		            }
+		        } catch (Exception ex) {
+		            mostrarError("Error al cargar datos: " + ex.getMessage());
+		            return;
+		        }
+		    }
+
+		    //Busca por id de usuario
+		    limpiarTabla();
+		    modelo.Usuario u = this.controlador.obtenerUsuarioPorId(id);
+		    if (u == null) {
+		        mostrarInfo("No existe un usuario con ese ID.");
+		        return;
+		    }
+
+		    //Muestra préstamos
+		    modelo.ColeccionPrestamos cp = this.controlador.obtenerPrestamosDeUsuario(id);
+		    if (cp == null || cp.vacia()) {
+		        mostrarInfo("El usuario no tiene préstamos para mostrar.");
+		        return;
+		    }
+
+		    for (int i = 0; i < cp.largo(); i++) {
+		        modelo.Prestamo p = cp.obtenerPrestamoPorPosicion(i);
+		        agregarFila(u, p);
+		    }
+		});
 	}
 	
 	public void setControladorCorreo(ActionListener al) {
 		btnEnviar.addActionListener(al);
 	}
-	
-	//Esto rompería el patrón MVC
-	/* btnCargar.addActionListener(e -> {
-   		// código que procesa el Excel y modifica la tabla
-	});*/
 	
     public void agregarFila(Usuario usuario, Prestamo prestamo) { 
     	this.modeloTabla.addRow(new Object[] {
@@ -133,14 +170,4 @@ public class DatosVista extends JFrame {
             return -1;
         }
     }
-    
- // GETTERS PARA RECONOCER EL BOTÓN DESDE EL CONTROLADOR
-    public JButton getBotonCargar() {
-        return btnCargar;
-    }
-
-    public JButton getBotonBuscarPorID() {
-        return btnBuscarPorID;
-    }
-    
 }
