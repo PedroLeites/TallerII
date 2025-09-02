@@ -72,11 +72,11 @@ public class Fecha {
         return LocalDate.of(anio, mes, dia);
     }
 
-    public static int diasEntre(Fecha desde, Fecha hasta) {
+    public static long diasEntre(Fecha desde, Fecha hasta) {
     	Fecha hoy = new Fecha();
-    	int dias = 0;
+    	long dias = 0;
     	if(hoy.toLocalDate().isAfter(hasta.toLocalDate())) {
-    		dias = (int) java.time.temporal.ChronoUnit.DAYS.between(desde.toLocalDate(), hasta.toLocalDate());
+    		dias = (long) java.time.temporal.ChronoUnit.DAYS.between(desde.toLocalDate(), hasta.toLocalDate());
     	}
     	return dias;
     }

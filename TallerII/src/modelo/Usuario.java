@@ -83,7 +83,7 @@ public class Usuario {
 	}
     
 	public void agregarPrestamo(Prestamo p) {
-        prestamos.agregar(p);
+        prestamos.agregarPrestamo(p);
     }
     
 }

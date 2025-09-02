@@ -3,7 +3,7 @@ package modelo;
 public class Prestamo {
     private Fecha fechaPrestamo; //aff_pret_date
     private Fecha fechaDevolucionPrevista; //aff_pret_retour
-    private int diasRetraso; //calcular con los atributos anteriores
+    private long diasRetraso; //calcular con los atributos anteriores
     private int idLibro; //expl_cb
     private String tituloLibro; //tit
 
@@ -13,7 +13,7 @@ public class Prestamo {
     }
 
     //Constructor específico
-    public Prestamo(Fecha fechaPrestamo, Fecha fechaDevolucion, int diasRetraso, int idLibro, String tituloLibro) {
+    public Prestamo(Fecha fechaPrestamo, Fecha fechaDevolucion, long diasRetraso, int idLibro, String tituloLibro) {
         this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucionPrevista = fechaDevolucion;
         this.diasRetraso = diasRetraso;
@@ -47,7 +47,7 @@ public class Prestamo {
         this.fechaDevolucionPrevista = fechaDevolucionPrevista;
     }
 
-    public int getDiasRetraso() {
+    public long getDiasRetraso() {
         return diasRetraso;
     }
 
