@@ -79,13 +79,13 @@ public class DatosVista extends JFrame {
 		
 		this.btnBuscarPorID.addActionListener(e-> {
 			int id = getIDUsuarioBuscado();
-			if (id <= -1) {
+			if (id == -1) {
 		        mostrarError("Ingrese un ID válido.");
 		        return;
 		    }
 
-		    //Verifica si los datos ya están cargados
-		    modelo.ColeccionUsuarios cu = this.controlador.obtenerUsuarios();
+		    //Asegurar datos cargados
+			ColeccionUsuarios cu = this.controlador.obtenerUsuarios();
 		    if (cu == null || cu.vacia()) {
 		        try {
 		            this.controlador.cargarDatos();           //intenta cargar
@@ -102,14 +102,14 @@ public class DatosVista extends JFrame {
 
 		    //Busca por id de usuario
 		    limpiarTabla();
-		    modelo.Usuario u = this.controlador.obtenerUsuarioPorId(id);
+		    Usuario u = this.controlador.consultaPrestamosPorEstudiante(id);
 		    if (u == null) {
 		        mostrarInfo("No existe un usuario con ese ID.");
 		        return;
 		    }
 
 		    //Muestra préstamos
-		    modelo.ColeccionPrestamos cp = this.controlador.obtenerPrestamosDeUsuario(id);
+		    ColeccionPrestamos cp = u.getPrestamosDeUsuario();
 		    if (cp == null || cp.vacia()) {
 		        mostrarInfo("El usuario no tiene préstamos para mostrar.");
 		        return;

@@ -93,41 +93,6 @@ public class ManejadoraDeDatos {
         procesarCadena();
     }
     
-    public String mostrarTodosLosPrestamos() {
-        if (this.usuarios == null || this.usuarios.vacia()) {
-            return "No hay datos cargados.";
-        }
-        String ls = System.lineSeparator();
-        StringBuilder sb = new StringBuilder();
-        sb.append("ColeccionUsuarios {total=").append(this.usuarios.largo()).append("}").append(ls);
-
-        java.util.ArrayList<Usuario> lista = this.usuarios.getUsuarios();
-        for (int i = 0; i < lista.size(); i++) {
-            Usuario u = lista.get(i);
-            if (u != null) {
-                sb.append("Usuario ").append(u.getId())
-                  .append(" - ").append(u.getNombreCompleto())
-                  .append(" <").append(u.getCorreo()).append(">").append(ls);
-                sb.append(u.getPrestamosDeUsuario().toString()).append(ls).append(ls);
-            }
-        }
-        return sb.toString();
-    }
-    
-    public String mostrarPrestamosDeUsuario(int idUsuario) {
-        Usuario u = obtenerUsuarioPorId(idUsuario);
-        if (u == null) {
-            return "No existe un usuario con ese ID o no hay datos cargados.";
-        }
-        String ls = System.lineSeparator();
-        StringBuilder sb = new StringBuilder();
-        sb.append("Usuario ").append(u.getId())
-          .append(" - ").append(u.getNombreCompleto())
-          .append(" <").append(u.getCorreo()).append(">").append(ls);
-        sb.append(u.getPrestamosDeUsuario().toString());
-        return sb.toString();
-    }
-    
     private long calcularDiasRetraso(Fecha fechaPrestamo, Fecha fechaDevolucionPrevista) {
     	long dias = 0;
     	Fecha hoy = new Fecha(java.time.LocalDate.now().getDayOfMonth(),
@@ -140,25 +105,38 @@ public class ManejadoraDeDatos {
     	
     	return dias;
     }
-
-    public ColeccionUsuarios obtenerUsuarios() {
-        return usuarios;
-    }
     
-    public Usuario obtenerUsuarioPorId(int id) {
-    	return usuarios.obtenerUsuario(id);
-    }
-    
-    public ColeccionPrestamos obtenerPrestamosDeUsuario(int idUsuario) {
-        Usuario u = obtenerUsuarioPorId(idUsuario);
+    public Usuario consultaPrestamosPorEstudiante(int idUsuario) {
+    	Usuario u = usuarios.obtenerUsuario(idUsuario);
         if (u == null) {
+            System.out.println("=== AVISO ===");
+            System.out.println("No existe un usuario con ese ID o no hay datos cargados.");
+            System.out.println("=============");
             return null;
         }
-        return u.getPrestamosDeUsuario();
+
+        //Armar el texto y mostrarlo en consola
+        String ls = System.lineSeparator();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Usuario ").append(u.getId())
+          .append(" - ").append(u.getNombreCompleto())
+          .append(" <").append(u.getCorreo()).append(">").append(ls);
+        sb.append(u.getPrestamosDeUsuario().toString());
+
+        System.out.println("=== PRÉSTAMOS DEL USUARIO ===");
+        System.out.println(sb.toString());
+        System.out.println("=============================");
+
+        //Devolver los datos para que la vista cargue la tabla
+        return u;
     }
 
     public Datos getDatos() {
         return datos;
+    }
+    
+    public ColeccionUsuarios obtenerUsuarios() {
+        return usuarios;
     }
     
 }
