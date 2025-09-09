@@ -2,110 +2,135 @@ package controlador;
 
 import javax.mail.*;
 import javax.mail.internet.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import modelo.Correo;
-import vista.DatosVista;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JOptionPane;
-
-public class ManejadoraDeCorreos implements ActionListener {
-	private final String remitente = "leitespedro2004@gmail.com";
-    private final String contraseña = "ymcb uzco roas xppx";
-    private DatosVista vista;
+public class ManejadoraDeCorreos {
+	private String remitente = "leitespedro2004@gmail.com";
+    private String contrasenia = "ymcb uzco roas xppx";
+    private Properties props;
     
-    public ManejadoraDeCorreos(DatosVista vista) {
-        this.vista = vista;
-        this.vista.setControladorCorreo(this);
+    public ManejadoraDeCorreos() {
+    	// Configuración para conectarse al servidor SMTP de Gmail
+    	props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+    }
+    
+    public ManejadoraDeCorreos(String remitente, String contrasenia) {
+        this();
+        this.remitente = remitente;
+        this.contrasenia = contrasenia;
     }
     
     public boolean enviar(Correo correo) {
     	boolean seMando = false;
     	
-    	// Configuración para conectarse al servidor SMTP de Gmail
-    	Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
-
-        // Crear la sesión con autenticación del remitente
-        Session sesion = Session.getInstance(props, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(remitente, contraseña);
-            }
-        });
-        
-        try {
-        	 // Crear mensaje de correo
-            Message mensaje = new MimeMessage(sesion);
-            mensaje.setFrom(new InternetAddress(remitente));
-            //mensaje.setRecipients(Message.RecipientType.TO, InternetAddress.parse(correo.getDestinatario()));
-            
-         //Procesar múltiples destinatarios por si aparece más de un mail en la celda
-            String[] correos = correo.getDestinatario().split("\\s+");
-            InternetAddress[] direcciones = new InternetAddress[correos.length];
-
-            for (int i = 0; i < correos.length; i++) {
-            	// Validar que sea una dirección de correo válida
-                if (!correos[i].matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
-                    System.out.println("Correo inválido: " + correos[i]);
-                    continue; // Salta correos inválidos
+    	try {
+    		List<String> destinos = correo.destinatariosValidos();
+    		
+    		// Crear la sesión con autenticación del remitente
+    		Session sesion = Session.getInstance(props, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(remitente, contrasenia);
                 }
-                direcciones[i] = new InternetAddress(correos[i]);
-            }
-
-         // Setear los destinatarios del correo
+            });
+    		
+    		// Crear mensaje de correo
+    		Message mensaje = new MimeMessage(sesion);
+    		mensaje.setFrom(new InternetAddress(remitente));
+             
+    		InternetAddress[] direcciones = new InternetAddress[destinos.size()];
+    		for (int i = 0; i < destinos.size(); i++) {
+    			direcciones[i] = new InternetAddress(destinos.get(i));
+    		}
             mensaje.setRecipients(Message.RecipientType.TO, direcciones);
-            
-         // Asunto y cuerpo del mensaje
             mensaje.setSubject(correo.getAsunto());
             mensaje.setText(correo.getCuerpo());
 
-            // Enviar el mensaje
             Transport.send(mensaje);
             seMando = true;
-            
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-        return seMando;
+    	} catch (MessagingException e) {
+    		e.printStackTrace();
+    	}
+    	return seMando;
     }
     
+    // Notificación por préstamo (fila)
+    public boolean enviarNotificacionAtrasoPorPrestamo(String destinatario,
+                                                       int cedula,
+                                                       String nombreCompleto,
+                                                       int idLibro,
+                                                       String tituloLibro,
+                                                       String fechaPrestamo,
+                                                       String fechaDevolucionPrevista,
+                                                       long diasAtraso) {
+    	
+        Correo c = new Correo(destinatario, cedula, nombreCompleto,
+                              idLibro, tituloLibro, fechaPrestamo, fechaDevolucionPrevista, diasAtraso,
+                              Correo.Tipo.NOTIFICACION_ATRASO);
+        return enviar(c);
+    }
     
-    @Override
-    public void actionPerformed(ActionEvent e) { // Este método se ejecuta cuando se hace clic en el botón de "Enviar correo"
-        Object[] datos = vista.getDatosFilaSeleccionada();
-        if (datos == null) {
-            JOptionPane.showMessageDialog(null, "Selecciona una fila primero.");
-            return;
+    // Notificación por usuario (varios préstamos en un solo correo)
+    public boolean enviarNotificacionAtrasoPorUsuario(String destinatario,
+                                                      int cedula,
+                                                      String nombreCompleto,
+                                                      List<Integer> idsLibros,
+                                                      List<String> titulosLibros,
+                                                      List<String> fechasPrestamo,
+                                                      List<String> fechasDevolucionPrevista,
+                                                      List<Long> diasAtraso) {
+    	
+        Correo c = new Correo(destinatario, cedula, nombreCompleto,
+                              idsLibros, titulosLibros, fechasPrestamo, fechasDevolucionPrevista, diasAtraso,
+                              Correo.Tipo.NOTIFICACION_ATRASO);
+        return enviar(c);
+    }
+    
+    // Constancia por préstamo (fila)
+    public boolean enviarConstanciaPorPrestamo(String destinatario,
+                                               int cedula,
+                                               String nombreCompleto,
+                                               int idLibro,
+                                               String tituloLibro,
+                                               String fechaPrestamo,
+                                               String fechaDevolucionPrevista) {
+        Correo c = new Correo(destinatario, cedula, nombreCompleto,
+                              idLibro, tituloLibro, fechaPrestamo, fechaDevolucionPrevista, 0L,
+                              Correo.Tipo.CONSTANCIA_DEVOLUCION);
+        return enviar(c);
+    }
+    
+    // Constancias por usuario (varios préstamos en un solo correo)
+    public boolean enviarConstanciasPorUsuario(String destinatario,
+                                               int cedula,
+                                               String nombreCompleto,
+                                               List<Integer> idsLibros,
+                                               List<String> titulosLibros,
+                                               List<String> fechasPrestamo,
+                                               List<String> fechasDevolucionPrevista) { 
+    	
+        int n = 0;
+        if (idsLibros != null) {
+            n = idsLibros.size();
+        }
+        ArrayList<Long> dias = new ArrayList<Long>();
+        for (int i = 0; i < n; i++) {
+            dias.add(0L);
         }
 
-        String fechaPrestamo = datos[0].toString();
-        String fechaDevolucion = datos[1].toString();
-        String nombre = datos[4].toString();
-        String correoDestino = datos[5].toString();
-        String tituloLibro = datos[6].toString();
-
-        String asunto = "Reclamo por entrega tardía de libro";
-        String cuerpo = "Estimado/a " + nombre + ",\n\n"
-                + "Le recordamos que tiene pendiente la devolución del libro:\n"
-                + tituloLibro + "\n"
-                + "Fecha de préstamo: " + fechaPrestamo + "\n"
-                + "Fecha límite de devolución: " + fechaDevolucion + "\n\n"
-                + "Le solicitamos regularizar su situación lo antes posible.\n\n"
-                + "Saludos cordiales,\nBiblioteca INET";
-
-        Correo correo = new Correo(correoDestino, asunto, cuerpo);
-        boolean enviado = enviar(correo);
-
-        if (enviado) {
-            JOptionPane.showMessageDialog(null, "Correo enviado correctamente");
-        } else {
-            JOptionPane.showMessageDialog(null, "Error al enviar correo");
-        }
+        Correo c = new Correo(destinatario, cedula, nombreCompleto,
+                              idsLibros, titulosLibros, fechasPrestamo, fechasDevolucionPrevista, dias,
+                              Correo.Tipo.CONSTANCIA_DEVOLUCION);
+        return enviar(c);
     }
     
 }
