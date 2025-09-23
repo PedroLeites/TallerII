@@ -76,68 +76,34 @@ public class ColeccionPrestamos {
         return esta;
     }
     
+    public int posicion(int id) {
+    	int p = 1;
+    	if (pertenece(id)) {
+    		boolean s = false;
+    		int i = 0;
+    		
+    		do {
+    			if (id == prestamos.get(i).getIdLibro()) {
+    				s = true;
+    				p = i;
+    			}
+    		} while(!s && i < this.largo());
+    	}
+    	return p;
+    }
+    
     //toString
     @Override
-    /*public String toString() {
-    	//Verifica si la colección es nula o vacía
-        if (prestamos == null || prestamos.isEmpty()) {
-            return "ColeccionPrestamos {total=0}" + System.lineSeparator() + "(la colección está vacía)";
-        }
-
-        //Usamos StringBuilder para armar la cadena de salida
-        String ls = System.lineSeparator();
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append("ColeccionPrestamos {total=").append(prestamos.size()).append("}").append(ls); //Encabezado con el total de préstamos
-        sb.append("----------------------------------------------------------------------------").append(ls); //Línea separadora
-        sb.append(String.format("%-6s | %-35s | %-12s | %-12s | %-6s%n",
-                "ID", "Título", "Prest.", "Dev.Prev.", "Retr.")); //Encabezados de las columnas
-        sb.append("----------------------------------------------------------------------------").append(ls);
-
-        for (int i = 0; i < prestamos.size(); i++) { //Recorremos la lista de préstamos
-            Prestamo p = prestamos.get(i);
-
-            if (p != null) { //Validamos que el préstamo no sea nulo
-            	String titulo = p.getTituloLibro(); //Columna Título
-                if (titulo == null) {
-                    titulo = "(sin título)";
-                } else {
-                    if (titulo.trim().isEmpty()) {
-                        titulo = "(sin título)";
-                    } else {
-                        if (titulo.length() > 35) {
-                            titulo = titulo.substring(0, 32) + "...";
-                        }
-                    }
-                }
-
-                String fP; //Columna Fecha de préstamo
-                if (p.getFechaPrestamo() == null) {
-                    fP = "--";
-                } else {
-                    fP = p.getFechaPrestamo().toString();
-                }
-
-                String fD; //Columna Fecha de devolución prevista
-                if (p.getFechaDevolucionPrevista() == null) {
-                    fD = "--";
-                } else {
-                    fD = p.getFechaDevolucionPrevista().toString();
-                }
-
-                long retraso = p.getDiasRetraso(); //Columna Retraso
-
-                sb.append(String.format("%-6d | %-35s | %-12s | %-12s | %-6d%n",
-                        p.getIdLibro(), titulo, fP, fD, retraso));
-            }
-        }
-        sb.append("----------------------------------------------------------------------------");
-        
-        return sb.toString(); //Devolvemos la cadena completa
-    }*/
-    
     public String toString() {
-    	return toString();
+    	return "Prestamos {" + prestamos + "}";
     }
-
+    
+    public void mostrarColPrestamos() {
+    	for (int i = 0; i < prestamos.size(); i++) {
+    		prestamos.get(i).mostrarPrestamo();
+    	}
+    }
+    
+    //Falta test caja blanca
+    
 }
