@@ -78,7 +78,7 @@ public class ColeccionPrestamos {
     
     //toString
     @Override
-    public String toString() {
+    /*public String toString() {
     	//Verifica si la colección es nula o vacía
         if (prestamos == null || prestamos.isEmpty()) {
             return "ColeccionPrestamos {total=0}" + System.lineSeparator() + "(la colección está vacía)";
@@ -134,6 +134,10 @@ public class ColeccionPrestamos {
         sb.append("----------------------------------------------------------------------------");
         
         return sb.toString(); //Devolvemos la cadena completa
+    }*/
+    
+    public String toString() {
+    	return toString();
     }
 
 }

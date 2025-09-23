@@ -1,5 +1,7 @@
 package modelo;
 
+import java.time.LocalDate;
+
 public class Prestamo {
     private Fecha fechaPrestamo; //aff_pret_date
     private Fecha fechaDevolucionPrevista; //aff_pret_retour
@@ -13,10 +15,12 @@ public class Prestamo {
     }
 
     //Constructor específico
-    public Prestamo(Fecha fechaPrestamo, Fecha fechaDevolucion, long diasRetraso, int idLibro, String tituloLibro) {
+    public Prestamo(Fecha fechaPrestamo, Fecha fechaDevolucion, int idLibro, String tituloLibro) {
         this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucionPrevista = fechaDevolucion;
-        this.diasRetraso = diasRetraso;
+        LocalDate hoy = LocalDate.now();
+        Fecha fechaHoy = new Fecha(hoy.getDayOfMonth(), hoy.getMonthValue(), hoy.getYear());
+        this.diasRetraso = Fecha.diasEntre(fechaDevolucionPrevista, fechaHoy);
         this.idLibro = idLibro;
         this.tituloLibro = tituloLibro;
     }
@@ -78,5 +82,10 @@ public class Prestamo {
 				+ ", diasRetraso=" + diasRetraso + ", idLibro=" + idLibro + ", tituloLibro=" + tituloLibro + "]";
 	}
 	
+	public void mostrarPrestamo() {
+		System.out.println(toString());
+	}	
+	
+	//Falta test caja blanca
 	
 }

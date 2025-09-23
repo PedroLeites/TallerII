@@ -9,7 +9,7 @@ public class Correo {
 	// Cabecera
     private Fecha fechaEmision;
     private Tipo tipo;
-    private String destinatario; // puede contener 1 o más direcciones separadas por coma, punto y coma o espacios
+    private String destinatario;
     private String asunto;
     private String cuerpo;
 
