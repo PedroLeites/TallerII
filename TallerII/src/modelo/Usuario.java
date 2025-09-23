@@ -90,6 +90,15 @@ public class Usuario {
 	public void agregarPrestamo(Prestamo p) {
         prestamos.agregarPrestamo(p);
     }
+	
+	public String librosAtrasados() {
+		return prestamos.toString();
+	}
+	
+	public void mostrarAtraso() {
+		//System.out.println(librosAtrasados());
+		prestamos.mostrarColPrestamos();
+	}
 
 	//toString
 	@Override
