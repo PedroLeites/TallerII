@@ -14,12 +14,12 @@ public class Datos {
     private String cadena;
     
     public Datos() {
-    	this.ruta = "datos2.xlsx"; // Ruta por defecto
+    	this.ruta = "datos2.xlsx"; //Ruta por defecto
         this.cadena = "";
         
         try {
         	if (ruta.endsWith(".xls")) {
-        		// JExcelAPI para .xls
+        		//JExcelAPI para .xls
         		Workbook libro = Workbook.getWorkbook(new FileInputStream(ruta));
                 Sheet hoja = libro.getSheet(0);
                 
@@ -33,7 +33,7 @@ public class Datos {
                 
                 libro.close();
         	}else if (ruta.endsWith(".xlsx")) {
-                // Apache POI para .xlsx
+                //Apache POI para .xlsx
         		java.io.FileInputStream fis = new java.io.FileInputStream(ruta);
         		org.apache.poi.ss.usermodel.Workbook libro = new org.apache.poi.xssf.usermodel.XSSFWorkbook(fis);
         		org.apache.poi.ss.usermodel.Sheet hoja = libro.getSheetAt(0);

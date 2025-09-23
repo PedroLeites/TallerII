@@ -1,5 +1,7 @@
 package modelo;
 
+import java.time.LocalDate;
+
 public class Prestamo {
     private Fecha fechaPrestamo; //aff_pret_date
     private Fecha fechaDevolucionPrevista; //aff_pret_retour
@@ -7,18 +9,23 @@ public class Prestamo {
     private int idLibro; //expl_cb
     private String tituloLibro; //tit
 
+    //Constructor com�n
     public Prestamo() {
     	
     }
 
-    public Prestamo(Fecha fechaPrestamo, Fecha fechaDevolucion, long diasRetraso, int idLibro, String tituloLibro) {
+    //Constructor espec�fico
+    public Prestamo(Fecha fechaPrestamo, Fecha fechaDevolucion, int idLibro, String tituloLibro) {
         this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucionPrevista = fechaDevolucion;
-        this.diasRetraso = diasRetraso;
+        LocalDate hoy = LocalDate.now();
+        Fecha fechaHoy = new Fecha(hoy.getDayOfMonth(), hoy.getMonthValue(), hoy.getYear());
+        this.diasRetraso = Fecha.diasEntre(fechaDevolucionPrevista, fechaHoy);
         this.idLibro = idLibro;
         this.tituloLibro = tituloLibro;
     }
     
+    //Constructor de copia
     public Prestamo(Prestamo p) {
         this.fechaPrestamo = p.fechaPrestamo;
         this.fechaDevolucionPrevista = p.fechaDevolucionPrevista;
@@ -48,7 +55,7 @@ public class Prestamo {
         return diasRetraso;
     }
 
-    public void setDiasRetraso(int diasRetraso) {
+    public void setDiasRetraso(long diasRetraso) {
         this.diasRetraso = diasRetraso;
     }
     
@@ -68,11 +75,17 @@ public class Prestamo {
 		this.tituloLibro = tituloLibro;
 	}
 
+	//toString
 	@Override
 	public String toString() {
-		return "Prestamo [fechaPrestamo=" + fechaPrestamo + ", fechaDevolucionPrevista=" + fechaDevolucionPrevista
+		return "\nPrestamo [fechaPrestamo=" + fechaPrestamo + ", fechaDevolucionPrevista=" + fechaDevolucionPrevista
 				+ ", diasRetraso=" + diasRetraso + ", idLibro=" + idLibro + ", tituloLibro=" + tituloLibro + "]";
 	}
 	
+	public void mostrarPrestamo() {
+		System.out.println(toString());
+	}	
+	
+	//Falta test caja blanca
 	
 }

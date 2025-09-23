@@ -1,17 +1,19 @@
 package modelo;
 
 public class Usuario {
-	private int id;
-    private int ci;
-    private String nombre;
-    private String apellido;
-    private String correo;
+	private int id; //id_empr
+    private int ci; //empr_cb
+    private String nombre; //empr_prenom
+    private String apellido; //empr_nom
+    private String correo; //empr_mail
     private ColeccionPrestamos prestamos;
     
+    //Constructor común
     public Usuario() {
     	this.prestamos = new ColeccionPrestamos();
     }
     
+    //Constructor específico
     public Usuario(int id, int ci, String nombre, String apellido, String correo) {
         this.id = id;
         this.ci = ci;
@@ -21,6 +23,7 @@ public class Usuario {
         this.prestamos = new ColeccionPrestamos();
     }
     
+    //Constructor de copia
     public Usuario(Usuario u) {
         this.id = u.id;
         this.ci = u.ci;
@@ -30,6 +33,7 @@ public class Usuario {
         this.prestamos = u.prestamos;
     }
 
+    //Getters y Setters
 	public int getId() {
 		return id;
 	}
@@ -74,16 +78,56 @@ public class Usuario {
 		this.correo = correo;
 	}
 
-	public ColeccionPrestamos getPrestamos() {
+	public ColeccionPrestamos getPrestamosDeUsuario() {
 		return prestamos;
 	}
 
-	public void setPrestamos(ColeccionPrestamos prestamos) {
+	public void setPrestamosDeUsuario(ColeccionPrestamos prestamos) {
 		this.prestamos = prestamos;
 	}
     
+	//Métodos específicos
 	public void agregarPrestamo(Prestamo p) {
-        prestamos.agregar(p);
+        prestamos.agregarPrestamo(p);
     }
+	
+	public String librosAtrasados() {
+		String resultado = "";
+		if (prestamos == null || prestamos.vacia()) {
+			resultado = "-";
+		}
+		
+		for (int i = 0; i < prestamos.largo(); i++) {
+			 Prestamo p = prestamos.obtenerPrestamoPorPosicion(i);
+			 resultado += p.getFechaPrestamo() + ","
+			            + p.getFechaDevolucionPrevista() + ","
+			            + p.getDiasRetraso() + ","
+			            + this.id + ","
+			            + limpiar(this.nombre) + ","
+			            + limpiar(this.apellido) + ","
+			            + limpiar(this.correo) + ","
+			            + limpiar(p.getTituloLibro()) + ","
+			            + p.getIdLibro() + ";";
+		}
+		
+		return resultado;
+	}
+	
+	// Evita que comas/; de los títulos rompan la vista
+	private String limpiar(String s) {
+	    return (s == null) ? "" : s.replace(",", " ").replace(";", " ");
+	}
+	
+	public void mostrarAtraso() {
+		System.out.println(librosAtrasados());
+		//prestamos.mostrarColPrestamos();
+	}
+
+	//toString
+	@Override
+	public String toString() {
+		return "Usuario [id=" + id + ", ci=" + ci + ", nombre=" + nombre + ", apellido=" + apellido + ", correo="
+				+ correo + ", prestamos=" + prestamos + "]";
+	}
     
 }

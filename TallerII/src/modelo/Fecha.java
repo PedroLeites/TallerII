@@ -1,26 +1,35 @@
 package modelo;
 
+import java.time.LocalDate;
+
 public class Fecha {
 	private int dia;
 	private int mes;
 	private int anio;
 	
+	//Constructor común
 	public Fecha() {
-		
+		LocalDate hoy = LocalDate.now();
+        this.dia = hoy.getDayOfMonth();
+        this.mes = hoy.getMonthValue();
+        this.anio = hoy.getYear();
 	}
 	
+	//Constructor específico
 	public Fecha(int dia, int mes, int anio) {
 		this.dia = dia;
 		this.mes = mes;
 		this.anio = anio;
 	}
 	
+	//Constructor de copia
 	public Fecha(Fecha f) {
 		this.dia = f.dia;
 		this.mes = f.mes;
 		this.anio = f.anio;
 	}
 	
+	//Constructor de Fecha a partir de un String
 	public Fecha(String fechaStr) {
         // Formato esperado: "dd/MM/yyyy"
         String[] partes = fechaStr.split("/");
@@ -33,6 +42,7 @@ public class Fecha {
         }
     }
 
+	//Getters y Setters
 	public int getDia() {
 		return dia;
 	}
@@ -57,16 +67,18 @@ public class Fecha {
 		this.anio = anio;
 	}
 	
-	public java.time.LocalDate toLocalDate() {
-        return java.time.LocalDate.of(anio, mes, dia);
+	//Métodos específicos
+	public LocalDate toLocalDate() {
+        return LocalDate.of(anio, mes, dia);
     }
 
-    public static int diasEntre(Fecha desde, Fecha hasta) {
-        return (int) java.time.temporal.ChronoUnit.DAYS.between(
-            desde.toLocalDate(), hasta.toLocalDate()
-        );
+    public static long diasEntre(Fecha desde, Fecha hasta) {
+    	long dias = 0;
+    	dias = (long) java.time.temporal.ChronoUnit.DAYS.between(desde.toLocalDate(), hasta.toLocalDate());
+    	return dias;
     }
     
+    //toString
     @Override
     public String toString() {
         return String.format("%02d/%02d/%04d", dia, mes, anio);

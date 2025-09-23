@@ -3,21 +3,40 @@ package vista;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionListener;
+
+import java.util.ArrayList;
+
+import controlador.ManejadoraDeDatos;
+import controlador.ManejadoraDeCorreos;
+
+import modelo.Usuario;
+import modelo.Prestamo;
+import modelo.ColeccionUsuarios;
+import modelo.ColeccionPrestamos;
 
 public class DatosVista extends JFrame {
+	private ManejadoraDeDatos controladorDatos;
+	private ManejadoraDeCorreos controladorCorreos;
+	
 	private JTable tabla;
 	private DefaultTableModel modeloTabla;
+	
 	private JButton btnCargar = new JButton("Cargar datos");
-	private JButton btnEnviar = new JButton("Enviar correo");
 	private JTextField campoBuscarID = new JTextField(10);
 	private JButton btnBuscarPorID = new JButton("Buscar por ID");
+	
+	private JButton btnNotifFila = new JButton("Notificar atraso (fila)");
+    private JButton btnNotifUsuario = new JButton("Notificar atraso (usuario)");
+    private JButton btnConstFila = new JButton("Constancia (fila)");
+    private JButton btnConstUsuario = new JButton("Constancias (usuario)");
+	
 	JPanel panelBotones = new JPanel();
+	JPanel panelCorreo = new JPanel(new FlowLayout(FlowLayout.CENTER));
 	
 	public DatosVista() {
 		super("Datos de préstamos vencidos");
 		
-		// Columnas de la tabla para mostrar los datos de los préstamos
+		//Columnas de la tabla para mostrar los datos de los préstamos
         modeloTabla = new DefaultTableModel(new String[] {
         		"Fecha Préstamo", "Fecha Devolución Prevista", "Días de Retraso",
                 "ID Usuario", "Nombre Completo", "Correo Electrónico",
@@ -30,7 +49,6 @@ public class DatosVista extends JFrame {
         
         panelBotones.setLayout(new FlowLayout(FlowLayout.CENTER));
         panelBotones.add(btnCargar);
-        panelBotones.add(btnEnviar);
         
         panelBotones.add(new JLabel("ID Usuario:"));
         panelBotones.add(campoBuscarID);
@@ -38,32 +56,325 @@ public class DatosVista extends JFrame {
         
         this.add(panelBotones, BorderLayout.SOUTH);
         
+        panelCorreo.add(btnNotifFila);
+        panelCorreo.add(btnNotifUsuario);
+        panelCorreo.add(btnConstFila);
+        panelCorreo.add(btnConstUsuario);
+
+        JPanel south = new JPanel(new GridLayout(2, 1));
+        south.add(panelBotones);
+        south.add(panelCorreo);
+
+        this.add(south, BorderLayout.SOUTH);
+        
         this.setSize(1000, 600);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLocationRelativeTo(null); // Centrar la ventana
+        this.setLocationRelativeTo(null); //Centrar la ventana
 	}
 	
-	//Este método asocia un ActionListener al botón btnCargar.
-	public void setControladorDatos(ActionListener al) { 
-		btnCargar.addActionListener(al); 
-		btnBuscarPorID.addActionListener(al);
+	public void setControladorDatos(ManejadoraDeDatos controlador) { 
+		this.controladorDatos = controlador;
+		
+		this.btnCargar.addActionListener(e -> {
+			try {
+				limpiarTabla();
+				this.controladorDatos.cargarDatos();
+				
+				ColeccionUsuarios cu = this.controladorDatos.obtenerUsuarios();
+				if(cu == null || cu.vacia()) {
+					mostrarInfo("No se encontraron préstamos para mostrar.");
+				}else {
+					for(int i = 0; i < cu.largo(); i++) {
+						Usuario u = cu.obtenerUsuarioPorPosicion(i);
+						ColeccionPrestamos cp = u.getPrestamosDeUsuario();
+						for(int j = 0; j < cp.largo(); j++) {
+							Prestamo p = cp.obtenerPrestamoPorPosicion(j);
+							agregarFila(u,p);
+						}
+					}
+				}
+				mostrarInfo("Datos cargados exitosamente.");
+			}catch (Exception ex) {
+				mostrarError("Error al cargar los datos: " + ex.getMessage());
+			}
+		});
+		
+		this.btnBuscarPorID.addActionListener(e-> {
+			int id = getIDUsuarioBuscado();
+			if (id <= -1) {
+		        mostrarError("Ingrese un ID válido.");
+		        return;
+		    }
+
+		    //Asegurar datos cargados
+			ColeccionUsuarios cu = this.controladorDatos.obtenerUsuarios();
+		    if (cu == null || cu.vacia()) {
+		        try {
+		            this.controladorDatos.cargarDatos();           //intenta cargar
+		            cu = this.controladorDatos.obtenerUsuarios();  //carga a los usuarios en memoria
+		            if (cu == null || cu.vacia()) {
+		                mostrarInfo("Datos no cargados. Verifique la ruta del archivo y vuelva a intentar.");
+		                return;
+		            }
+		        } catch (Exception ex) {
+		            mostrarError("Error al cargar datos: " + ex.getMessage());
+		            return;
+		        }
+		    }
+
+		    // Consultar cadena tokenizada
+		    String cadena = this.controladorDatos.consultaPrestamosPorUsuario(id);
+		    limpiarTabla();
+		    
+		    if (cadena == null || cadena.trim().isEmpty()) {
+		        // No existe usuario o no tiene préstamos
+		        if (!cu.pertenece(id)) {
+		            mostrarInfo("No existe un usuario con ese ID.");
+		        } else {
+		            mostrarInfo("El usuario no tiene préstamos para mostrar.");
+		        }
+		        return;
+		    }
+
+		    // Parsear filas: separador ';'
+		    String[] filas = cadena.split(";");
+		    for (String fila : filas) {
+		        String f = fila.trim();
+		        if (f.isEmpty()) continue;
+
+		        // Parsear columnas: separador ','
+		        String[] c = f.split(",", -1); // -1 para no perder vacíos
+		        if (c.length < 9) {
+		            // Fila mal formada, la salteamos
+		            continue;
+		        }
+
+		        // Indices (deben coincidir con el formato que generamos):
+		        // 0: fechaPrestamo
+		        // 1: fechaDevolucion
+		        // 2: diasRetraso
+		        // 3: idUsuario
+		        // 4: nombre
+		        // 5: apellido
+		        // 6: correo
+		        // 7: titulo
+		        // 8: idLibro
+
+		        try {
+		            // Construir objetos para reutilizar tu agregarFila(Usuario, Prestamo)
+		            modelo.Usuario u = new modelo.Usuario(
+		                Integer.parseInt(c[3].trim()),
+		                0, // CI no viene en la cadena; dejamos 0
+		                c[4].trim(),
+		                c[5].trim(),
+		                c[6].trim()
+		            );
+
+		            modelo.Prestamo p = new modelo.Prestamo(
+		                new modelo.Fecha(c[0].trim()),
+		                new modelo.Fecha(c[1].trim()),
+		                Integer.parseInt(c[8].trim()),
+		                c[7].trim()
+		            );
+
+		            // (Opcional) Si querés forzar el valor de días de retraso al devuelto en la cadena:
+		            try {
+		                long dias = Long.parseLong(c[2].trim());
+		                p.setDiasRetraso(dias);
+		            } catch (NumberFormatException ignore) {
+		                // si no parsea, queda el calculado por el constructor
+		            }
+
+		            agregarFila(u, p);
+		        } catch (Exception exFila) {
+		            // fila con datos inválidos: la ignoramos para no frenar al usuario
+		            System.err.println("Fila inválida al parsear búsqueda por ID: " + exFila.getMessage());
+		        }
+		    }
+		    
+		});
 	}
 	
-	public void setControladorCorreo(ActionListener al) {
-		btnEnviar.addActionListener(al);
+	public void setControladorCorreo(ManejadoraDeCorreos controlador) {
+		this.controladorCorreos = controlador;
+		
+		// Notificar atraso por préstamo (fila)
+        btnNotifFila.addActionListener(e -> {
+            int row = tabla.getSelectedRow();
+            if (row == -1) {
+                mostrarError("Seleccione una fila primero.");
+                return;
+            }
+
+            String destinatario = String.valueOf(modeloTabla.getValueAt(row, 5));
+            int cedula = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(row, 3)));
+            String nombre = String.valueOf(modeloTabla.getValueAt(row, 4));
+            int idLibro = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(row, 7)));
+            String titulo = String.valueOf(modeloTabla.getValueAt(row, 6));
+            String fPrest = String.valueOf(modeloTabla.getValueAt(row, 0));
+            String fDev = String.valueOf(modeloTabla.getValueAt(row, 1));
+            long dias = Long.parseLong(String.valueOf(modeloTabla.getValueAt(row, 2)));
+
+            boolean ok = controladorCorreos.enviarNotificacionAtrasoPorPrestamo(
+                    destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev, dias
+            );
+
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Notificación enviada correctamente.", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+     // Notificar atraso por usuario (todas las filas visibles del mismo ID)
+        btnNotifUsuario.addActionListener(e -> {
+            int row = tabla.getSelectedRow();
+            if (row == -1) {
+                mostrarError("Seleccione una fila para identificar al usuario.");
+                return;
+            }
+
+            int idUsuario = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(row, 3)));
+            String destinatario = String.valueOf(modeloTabla.getValueAt(row, 5));
+            String nombre = String.valueOf(modeloTabla.getValueAt(row, 4));
+            int total = modeloTabla.getRowCount();
+
+            ArrayList<Integer> ids = new ArrayList<Integer>();
+            ArrayList<String> titulos = new ArrayList<String>();
+            ArrayList<String> fPrest = new ArrayList<String>();
+            ArrayList<String> fDev = new ArrayList<String>();
+            ArrayList<Long> dias = new ArrayList<Long>();
+
+            for (int r = 0; r < total; r++) {
+                int idU = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(r, 3)));
+                if (idU == idUsuario) {
+                    ids.add(Integer.parseInt(String.valueOf(modeloTabla.getValueAt(r, 7))));
+                    titulos.add(String.valueOf(modeloTabla.getValueAt(r, 6)));
+                    fPrest.add(String.valueOf(modeloTabla.getValueAt(r, 0)));
+                    fDev.add(String.valueOf(modeloTabla.getValueAt(r, 1)));
+                    dias.add(Long.parseLong(String.valueOf(modeloTabla.getValueAt(r, 2))));
+                }
+            }
+
+            if (ids.isEmpty()) {
+                mostrarInfo("No hay préstamos visibles para ese usuario.");
+                return;
+            }
+
+            boolean ok = controladorCorreos.enviarNotificacionAtrasoPorUsuario(
+                    destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev, dias
+            );
+
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Notificación (usuario) enviada.", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación (usuario).", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Constancia por préstamo (fila)
+        btnConstFila.addActionListener(e -> {
+            int row = tabla.getSelectedRow();
+            if (row == -1) {
+                mostrarError("Seleccione una fila primero.");
+                return;
+            }
+
+            String destinatario = String.valueOf(modeloTabla.getValueAt(row, 5));
+            int cedula = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(row, 3)));
+            String nombre = String.valueOf(modeloTabla.getValueAt(row, 4));
+            int idLibro = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(row, 7)));
+            String titulo = String.valueOf(modeloTabla.getValueAt(row, 6));
+            String fPrest = String.valueOf(modeloTabla.getValueAt(row, 0));
+            String fDev = String.valueOf(modeloTabla.getValueAt(row, 1));
+
+            boolean ok = controladorCorreos.enviarConstanciaPorPrestamo(
+                    destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev
+            );
+
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Constancia enviada correctamente.", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo enviar la constancia.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Constancias por usuario (todas las filas visibles del mismo ID)
+        btnConstUsuario.addActionListener(e -> {
+            int row = tabla.getSelectedRow();
+            if (row == -1) {
+                mostrarError("Seleccione una fila para identificar al usuario.");
+                return;
+            }
+
+            int idUsuario = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(row, 3)));
+            String destinatario = String.valueOf(modeloTabla.getValueAt(row, 5));
+            String nombre = String.valueOf(modeloTabla.getValueAt(row, 4));
+            int total = modeloTabla.getRowCount();
+
+            ArrayList<Integer> ids = new ArrayList<Integer>();
+            ArrayList<String> titulos = new ArrayList<String>();
+            ArrayList<String> fPrest = new ArrayList<String>();
+            ArrayList<String> fDev = new ArrayList<String>();
+
+            for (int r = 0; r < total; r++) {
+                int idU = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(r, 3)));
+                if (idU == idUsuario) {
+                    ids.add(Integer.parseInt(String.valueOf(modeloTabla.getValueAt(r, 7))));
+                    titulos.add(String.valueOf(modeloTabla.getValueAt(r, 6)));
+                    fPrest.add(String.valueOf(modeloTabla.getValueAt(r, 0)));
+                    fDev.add(String.valueOf(modeloTabla.getValueAt(r, 1)));
+                }
+            }
+
+            if (ids.isEmpty()) {
+                mostrarInfo("No hay préstamos visibles para ese usuario.");
+                return;
+            }
+
+            boolean ok = controladorCorreos.enviarConstanciasPorUsuario(
+                    destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev
+            );
+
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Constancias enviadas.", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudieron enviar las constancias.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
 	}
 	
-	//Esto rompería el patrón MVC
-	/* btnCargar.addActionListener(e -> {
-   		// código que procesa el Excel y modifica la tabla
-	});*/
-	
-    public void agregarFila(Object[] fila) { 
-    	modeloTabla.addRow(fila); 
+    public void agregarFila(Usuario usuario, Prestamo prestamo) { 
+    	this.modeloTabla.addRow(new Object[] {
+    			prestamo.getFechaPrestamo(),
+    			prestamo.getFechaDevolucionPrevista(),
+    			prestamo.getDiasRetraso(),
+    			usuario.getId(),
+    			usuario.getNombreCompleto(),
+    			usuario.getCorreo(),
+    			prestamo.getTituloLibro(),
+    			prestamo.getIdLibro()
+    	});
     }
     
     public void limpiarTabla() { 
     	modeloTabla.setRowCount(0); 
+    }
+    
+    public void mostrarInfo(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Información", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    public void mostrarError(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
 	
  // Método que el controlador usará para obtener la fila seleccionada
@@ -85,14 +396,4 @@ public class DatosVista extends JFrame {
             return -1;
         }
     }
-    
- // GETTERS PARA RECONOCER EL BOTÓN DESDE EL CONTROLADOR
-    public JButton getBotonCargar() {
-        return btnCargar;
-    }
-
-    public JButton getBotonBuscarPorID() {
-        return btnBuscarPorID;
-    }
-    
 }
