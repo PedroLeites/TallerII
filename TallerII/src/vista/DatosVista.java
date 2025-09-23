@@ -215,17 +215,12 @@ public class DatosVista extends JFrame {
             String fDev = String.valueOf(modeloTabla.getValueAt(row, 1));
             long dias = Long.parseLong(String.valueOf(modeloTabla.getValueAt(row, 2)));
 
-            boolean ok = controladorCorreos.enviarNotificacionAtrasoPorPrestamo(
+            controladorCorreos.enviarNotificacionAtrasoPorPrestamo(
                     destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev, dias
-            );
+                );
 
-            if (ok) {
-                JOptionPane.showMessageDialog(this, "Notificación enviada correctamente.", "Éxito",
+                JOptionPane.showMessageDialog(this, "Se intentó enviar la notificación (fila).", "Aviso",
                         JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
         });
         
      // Notificar atraso por usuario (todas las filas visibles del mismo ID)
@@ -263,17 +258,12 @@ public class DatosVista extends JFrame {
                 return;
             }
 
-            boolean ok = controladorCorreos.enviarNotificacionAtrasoPorUsuario(
+            controladorCorreos.enviarNotificacionAtrasoPorUsuario(
                     destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev, dias
-            );
+                );
 
-            if (ok) {
-                JOptionPane.showMessageDialog(this, "Notificación (usuario) enviada.", "Éxito",
+                JOptionPane.showMessageDialog(this, "Se intentó enviar la notificación (usuario).", "Aviso",
                         JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación (usuario).", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
         });
 
         // Constancia por préstamo (fila)
@@ -292,17 +282,12 @@ public class DatosVista extends JFrame {
             String fPrest = String.valueOf(modeloTabla.getValueAt(row, 0));
             String fDev = String.valueOf(modeloTabla.getValueAt(row, 1));
 
-            boolean ok = controladorCorreos.enviarConstanciaPorPrestamo(
+            controladorCorreos.enviarConstanciaPorPrestamo(
                     destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev
-            );
+                );
 
-            if (ok) {
-                JOptionPane.showMessageDialog(this, "Constancia enviada correctamente.", "Éxito",
+                JOptionPane.showMessageDialog(this, "Se intentó enviar la constancia (fila).", "Aviso",
                         JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "No se pudo enviar la constancia.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
         });
 
         // Constancias por usuario (todas las filas visibles del mismo ID)
@@ -338,17 +323,12 @@ public class DatosVista extends JFrame {
                 return;
             }
 
-            boolean ok = controladorCorreos.enviarConstanciasPorUsuario(
+            controladorCorreos.enviarConstanciasPorUsuario(
                     destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev
-            );
+                );
 
-            if (ok) {
-                JOptionPane.showMessageDialog(this, "Constancias enviadas.", "Éxito",
+                JOptionPane.showMessageDialog(this, "Se intentó enviar las constancias (usuario).", "Aviso",
                         JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "No se pudieron enviar las constancias.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
         });
 	}
 	

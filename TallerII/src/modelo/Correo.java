@@ -104,7 +104,13 @@ public class Correo {
     	}
     }
     
- // Asuntos
+ @Override
+	public String toString() {
+		return "Correo [fechaEmision=" + fechaEmision + ", destinatario=" + destinatario + ", remitente=" + remitente
+				+ ", contrasenia=" + contrasenia + ", asunto=" + asunto + ", mensaje=" + mensaje + "]";
+	}
+
+	// Asuntos
     public static String asuntoPara(Tipo tipo, int cantidadPrestamos) {
         if (tipo == Tipo.CONSTANCIA_DEVOLUCION) {
             return (cantidadPrestamos <= 1) ? "Constancia de devolución de libro"
