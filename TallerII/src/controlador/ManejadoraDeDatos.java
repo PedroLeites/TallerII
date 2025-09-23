@@ -50,8 +50,7 @@ public class ManejadoraDeDatos {
                 // Interpretamos las fechas
                 Fecha fechaPrestamo = new Fecha(celdas[0].trim());
                 Fecha fechaDevolucion = new Fecha(celdas[1].trim());
-                long diasRetraso = calcularDiasRetraso(fechaPrestamo, fechaDevolucion);
-
+                
                 // Datos del usuario
                 int idUsuario = (int) Double.parseDouble(celdas[3].trim());
                 String apellido = celdas[4].trim();
@@ -64,7 +63,7 @@ public class ManejadoraDeDatos {
                 String titulo = celdas[14].trim();
 
                 // Creamos el préstamo
-                Prestamo prestamo = new Prestamo(fechaPrestamo, fechaDevolucion, diasRetraso, idLibro, titulo);
+                Prestamo prestamo = new Prestamo(fechaPrestamo, fechaDevolucion, idLibro, titulo);
 
                 // Si el usuario ya existe, lo reutilizamos; si no, lo creamos
                 Usuario usuario;
@@ -93,50 +92,33 @@ public class ManejadoraDeDatos {
         procesarCadena();
     }
     
-    private long calcularDiasRetraso(Fecha fechaPrestamo, Fecha fechaDevolucionPrevista) {
-    	long dias = 0;
-    	Fecha hoy = new Fecha(java.time.LocalDate.now().getDayOfMonth(),
-                java.time.LocalDate.now().getMonthValue(),
-                java.time.LocalDate.now().getYear());
-
-    	if (hoy.toLocalDate().isAfter(fechaDevolucionPrevista.toLocalDate())) {
-    		dias = Fecha.diasEntre(fechaDevolucionPrevista, hoy);
-    	}
-    	
-    	return dias;
+    public String consultaPrestamosPorUsuario(int idUsuario) {
+    	Usuario u = usuarios.obtenerUsuario(idUsuario);
+    	return u.librosAtrasados();
     }
     
-    public Usuario consultaPrestamosPorEstudiante(int idUsuario) {
-    	Usuario u = usuarios.obtenerUsuario(idUsuario);
-        if (u == null) {
-            System.out.println("=== AVISO ===");
-            System.out.println("No existe un usuario con ese ID o no hay datos cargados.");
-            System.out.println("=============");
-            return null;
-        }
-
-        //Armar el texto y mostrarlo en consola
-        String ls = System.lineSeparator();
-        StringBuilder sb = new StringBuilder();
-        sb.append("Usuario ").append(u.getId())
-          .append(" - ").append(u.getNombreCompleto())
-          .append(" <").append(u.getCorreo()).append(">").append(ls);
-        sb.append(u.getPrestamosDeUsuario().toString());
-
-        System.out.println("=== PRÉSTAMOS DEL USUARIO ===");
-        System.out.println(sb.toString());
-        System.out.println("=============================");
-
-        //Devolver los datos para que la vista cargue la tabla
-        return u;
+    public void mostrarPrestamosPorUsuario(int idUsuario) {
+    	System.out.println(consultaPrestamosPorUsuario(idUsuario));
     }
 
     public Datos getDatos() {
         return datos;
-    }
+    } 
     
     public ColeccionUsuarios obtenerUsuarios() {
         return usuarios;
     }
     
+    //Test caja blanca
+    /*public static void main(String[] args) {
+    	
+    	ManejadoraDeDatos md = new ManejadoraDeDatos();
+    	md.procesarCadena();
+    	Usuario u = md.obtenerUsuarios().obtenerUsuario(637);
+    	System.out.println(u);
+    	System.out.println("Prueba de mostrar prestamos atrasados de por usuario");
+    	md.mostrarPrestamosPorUsuario(637);
+    	
+    }
+    */
 }

@@ -78,29 +78,26 @@ public class ColeccionUsuarios {
         return esta;
     }
     
+    public int posicion(int id) {
+    	int p = 1;
+    	if (pertenece(id)) {
+    		boolean s = false;
+    		int i = 0;
+    		
+    		do {
+    			if (id == usuarios.get(i).getId()) {
+    				s = true;
+    				p = i;
+    			}
+    		} while(!s && i < this.largo());
+    	}
+    	return p;
+    }
+    
     //toString
     @Override
     public String toString() {
-        if (usuarios == null || usuarios.isEmpty()) {
-            return "ColeccionUsuarios {total=0} (la colección está vacía)";
-        }
-
-        String ls = System.lineSeparator();
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("ColeccionUsuarios {total=")
-          .append(usuarios.size())
-          .append("}")
-          .append(ls);
-
-        for (int i = 0; i < usuarios.size(); i++) {
-            Usuario u = usuarios.get(i);
-            if (u != null) {
-                sb.append(u.toString()).append(ls);
-            }
-        }
-
-        return sb.toString();
+    	return "Usuarios {" + usuarios + "}";
     }
     
 }
