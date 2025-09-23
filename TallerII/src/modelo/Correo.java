@@ -1,149 +1,46 @@
 package modelo;
 
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.util.Properties;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Correo {
 	public enum Tipo {NOTIFICACION_ATRASO, CONSTANCIA_DEVOLUCION}
-	
-	// Cabecera
+
     private Fecha fechaEmision;
-    private Tipo tipo;
     private String destinatario;
+    private String remitente;
+    private String contrasenia;
     private String asunto;
-    private String cuerpo;
+    private String mensaje;
 
-    // Datos del usuario
-    private int cedulaUsuario;
-    private String nombreCompletoUsuario;
-
-    // Listas paralelas de préstamos (sirve para 1 o N)
-    private ArrayList<Integer> idsLibros;
-    private ArrayList<String> titulosLibros;
-    private ArrayList<String> fechasPrestamo;
-    private ArrayList<String> fechasDevolucionPrevista;
-    private ArrayList<Long> diasAtraso;
-	
     //Constructores
     public Correo() {
-        this.fechaEmision = new Fecha();
-        this.tipo = Tipo.NOTIFICACION_ATRASO;
-        this.destinatario = "";
-        this.asunto = "";
-        this.cuerpo = "";
-        this.cedulaUsuario = 0;
-        this.nombreCompletoUsuario = "";
-        this.idsLibros = new ArrayList<Integer>();
-        this.titulosLibros = new ArrayList<String>();
-        this.fechasPrestamo = new ArrayList<String>();
-        this.fechasDevolucionPrevista = new ArrayList<String>();
-        this.diasAtraso = new ArrayList<Long>();
+        
     }
     
-    // Un préstamo (fila)
-    public Correo(String destinatario,
-                  int cedulaUsuario,
-                  String nombreCompletoUsuario,
-                  int idLibro,
-                  String tituloLibro,
-                  String fechaPrestamo,
-                  String fechaDevolucionPrevista,
-                  long diasAtraso,
-                  Tipo tipo) {
-
-        this();
-        if (destinatario != null) {
-            this.destinatario = destinatario;
-        } else {
-            this.destinatario = "";
-        }
-
-        this.cedulaUsuario = cedulaUsuario;
-
-        if (nombreCompletoUsuario != null) {
-            this.nombreCompletoUsuario = nombreCompletoUsuario;
-        } else {
-            this.nombreCompletoUsuario = "";
-        }
-
-        if (tipo != null) {
-            this.tipo = tipo;
-        } else {
-            this.tipo = Tipo.NOTIFICACION_ATRASO;
-        }
-
-        agregarPrestamo(idLibro, tituloLibro, fechaPrestamo, fechaDevolucionPrevista, diasAtraso);
-        generarContenido();
+    public Correo(String destinatario, String asunto, String mensaje) {
+    	LocalDate hoy = LocalDate.now();
+    	this.fechaEmision = new Fecha(hoy.getDayOfMonth(), hoy.getMonthValue(), hoy.getYear());
+    	
+    	this.destinatario = destinatario;
+    	
+    	this.remitente = "leitespedro2004@gmail.com";
+    	this.contrasenia = "ymcb uzco roas xppx";
+    	
+    	this.asunto = asunto;
+    	this.mensaje = mensaje;
+    	
+    	enviar();
+    	
     }
 
-    // Varios préstamos (usuario)
-    public Correo(String destinatario,
-                  int cedulaUsuario,
-                  String nombreCompletoUsuario,
-                  List<Integer> idsLibros,
-                  List<String> titulosLibros,
-                  List<String> fechasPrestamo,
-                  List<String> fechasDevolucionPrevista,
-                  List<Long> diasAtraso,
-                  Tipo tipo) {
-
-        this();
-
-        if (destinatario != null) {
-            this.destinatario = destinatario;
-        } else {
-            this.destinatario = "";
-        }
-
-        this.cedulaUsuario = cedulaUsuario;
-
-        if (nombreCompletoUsuario != null) {
-            this.nombreCompletoUsuario = nombreCompletoUsuario;
-        } else {
-            this.nombreCompletoUsuario = "";
-        }
-
-        if (tipo != null) {
-            this.tipo = tipo;
-        } else {
-            this.tipo = Tipo.NOTIFICACION_ATRASO;
-        }
-
-        if (idsLibros != null) {
-            for (int i = 0; i < idsLibros.size(); i++) {
-                this.idsLibros.add(idsLibros.get(i));
-            }
-        }
-        if (titulosLibros != null) {
-            for (int i = 0; i < titulosLibros.size(); i++) {
-                this.titulosLibros.add(titulosLibros.get(i));
-            }
-        }
-        if (fechasPrestamo != null) {
-            for (int i = 0; i < fechasPrestamo.size(); i++) {
-                this.fechasPrestamo.add(fechasPrestamo.get(i));
-            }
-        }
-        if (fechasDevolucionPrevista != null) {
-            for (int i = 0; i < fechasDevolucionPrevista.size(); i++) {
-                this.fechasDevolucionPrevista.add(fechasDevolucionPrevista.get(i));
-            }
-        }
-        if (diasAtraso != null) {
-            for (int i = 0; i < diasAtraso.size(); i++) {
-                this.diasAtraso.add(diasAtraso.get(i));
-            }
-        }
-
-        generarContenido();
-    }
-	
     //Getters y Setters
     public Fecha getFechaEmision() { return fechaEmision; }
     public void setFechaEmision(Fecha fechaEmision) { this.fechaEmision = fechaEmision; }
-
-    public Tipo getTipo() { return tipo; }
-    public void setTipo(Tipo tipo) { this.tipo = tipo; }
 
     public String getDestinatario() { return destinatario; }
     public void setDestinatario(String destinatario) { this.destinatario = destinatario; }
@@ -151,203 +48,149 @@ public class Correo {
     public String getAsunto() { return asunto; }
     public void setAsunto(String asunto) { this.asunto = asunto; }
 
-    public String getCuerpo() { return cuerpo; }
-    public void setCuerpo(String cuerpo) { this.cuerpo = cuerpo; }
-
-    public int getCedulaUsuario() { return cedulaUsuario; }
-    public void setCedulaUsuario(int cedulaUsuario) { this.cedulaUsuario = cedulaUsuario; }
-
-    public String getNombreCompletoUsuario() { return nombreCompletoUsuario; }
-    public void setNombreCompletoUsuario(String nombreCompletoUsuario) { this.nombreCompletoUsuario = nombreCompletoUsuario; }
-
-    public List<Integer> getIdsLibros() { return new ArrayList<Integer>(idsLibros); }
-    public void setIdsLibros(List<Integer> idsLibros) {
-        this.idsLibros.clear();
-        if (idsLibros != null) {
-            for (int i = 0; i < idsLibros.size(); i++) {
-                this.idsLibros.add(idsLibros.get(i));
-            }
-        }
-    }
-
-    public List<String> getTitulosLibros() { return new ArrayList<String>(titulosLibros); }
-    public void setTitulosLibros(List<String> titulosLibros) {
-        this.titulosLibros.clear();
-        if (titulosLibros != null) {
-            for (int i = 0; i < titulosLibros.size(); i++) {
-                this.titulosLibros.add(titulosLibros.get(i));
-            }
-        }
-    }
-
-    public List<String> getFechasPrestamo() { return new ArrayList<String>(fechasPrestamo); }
-    public void setFechasPrestamo(List<String> fechasPrestamo) {
-        this.fechasPrestamo.clear();
-        if (fechasPrestamo != null) {
-            for (int i = 0; i < fechasPrestamo.size(); i++) {
-                this.fechasPrestamo.add(fechasPrestamo.get(i));
-            }
-        }
-    }
-
-    public List<String> getFechasDevolucionPrevista() { return new ArrayList<String>(fechasDevolucionPrevista); }
-    public void setFechasDevolucionPrevista(List<String> fechasDevolucionPrevista) {
-        this.fechasDevolucionPrevista.clear();
-        if (fechasDevolucionPrevista != null) {
-            for (int i = 0; i < fechasDevolucionPrevista.size(); i++) {
-                this.fechasDevolucionPrevista.add(fechasDevolucionPrevista.get(i));
-            }
-        }
-    }
-
-    public List<Long> getDiasAtraso() { return new ArrayList<Long>(diasAtraso); }
-    public void setDiasAtraso(List<Long> diasAtraso) {
-        this.diasAtraso.clear();
-        if (diasAtraso != null) {
-            for (int i = 0; i < diasAtraso.size(); i++) {
-                this.diasAtraso.add(diasAtraso.get(i));
-            }
-        }
-    }
+    public String getMensaje() { return mensaje; }
+    public void setMensaje(String cuerpo) { this.mensaje = cuerpo; }
     
     //Métodos Específicos
-    public void agregarPrestamo(int idLibro, String tituloLibro, String fechaPrestamo, String fechaDevolucionPrevista, long diasAtraso) {
-    	this.idsLibros.add(idLibro);
+    private void enviar() {
+    	
+		
+		try {
+			//Controlar celdas con varias direcciones de correo
+			ArrayList<String> destinos = destinatariosValidos(this.destinatario);
+            if (destinos.isEmpty()) {
+                System.err.println("Correo: no hay destinatarios válidos.");
+                return;
+            }
+            
+            if (this.remitente.isEmpty() || this.contrasenia.isEmpty()) {
+                System.err.println("Correo: remitente o contraseña no configurados.");
+                return;
+            }
+			
+			//Configuración para conectarse al servidor SMTP de Gmail
+	    	Properties props = new Properties();
+	    	props.put("mail.smtp.auth", "true");
+	        props.put("mail.smtp.starttls.enable", "true");
+	        props.put("mail.smtp.host", "smtp.gmail.com");
+	        props.put("mail.smtp.port", "587");
+	        
+	        //Crear la sesión con autenticación del remitente
+			Session sesion = Session.getInstance(props, new Authenticator() {
+	            @Override
+	            protected PasswordAuthentication getPasswordAuthentication() {
+	                return new PasswordAuthentication(remitente, contrasenia);
+	            }
+	        });
+			
+			//Creación del mensaje
+			Message msj = new MimeMessage(sesion);
+    		msj.setFrom(new InternetAddress(remitente));
+    		
+    		InternetAddress[] direcciones = new InternetAddress[destinos.size()];
+    		for (int i = 0; i < destinos.size(); i++) {
+    			direcciones[i] = new InternetAddress(destinos.get(i));
+    		}
+            msj.setRecipients(Message.RecipientType.TO, direcciones);
+            msj.setSubject(asunto);
+            msj.setText(mensaje);
 
-    	if (tituloLibro != null) {
-    		this.titulosLibros.add(tituloLibro);
-    	} else {
-    		this.titulosLibros.add("");
+            Transport.send(msj);
+    		
+            System.out.println("Mensaje enviado con éxito");
+            
+		} catch (MessagingException e) {
+    		e.printStackTrace();
     	}
-
-    	if (fechaPrestamo != null) {
-    		this.fechasPrestamo.add(fechaPrestamo);
-    	} else {
-    		this.fechasPrestamo.add("");
-    	}
-
-    	if (fechaDevolucionPrevista != null) {
-    		this.fechasDevolucionPrevista.add(fechaDevolucionPrevista);
-    	} else {
-    		this.fechasDevolucionPrevista.add("");
-    	}
-
-    	this.diasAtraso.add(diasAtraso);
     }
     
-    public void generarContenido() {
-        if (this.tipo == Tipo.NOTIFICACION_ATRASO) {
-            this.asunto = construirAsuntoNotificacion();
-            this.cuerpo = construirCuerpoNotificacion();
-        } else {
-            this.asunto = construirAsuntoConstancia();
-            this.cuerpo = construirCuerpoConstancia();
+ // Asuntos
+    public static String asuntoPara(Tipo tipo, int cantidadPrestamos) {
+        if (tipo == Tipo.CONSTANCIA_DEVOLUCION) {
+            return (cantidadPrestamos <= 1) ? "Constancia de devolución de libro"
+                                            : "Constancias de devolución (" + cantidadPrestamos + " préstamos)";
         }
+        // NOTIFICACION_ATRASO
+        return (cantidadPrestamos <= 1) ? "Notificación de devolución pendiente"
+                                        : "Notificación de devolución pendiente (" + cantidadPrestamos + " préstamos)";
     }
-    
-    private String construirAsuntoNotificacion() {
-        int n = this.idsLibros.size();
-        if (n <= 1) {
-            return "Notificación de devolución pendiente";
-        } else {
-            return "Notificación de devolución pendiente (" + n + " préstamos)";
-        }
-    }
-    
-    private String construirCuerpoNotificacion() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Estimado/a ").append(this.nombreCompletoUsuario).append(",\n\n");
-        sb.append("Le recordamos que tiene devolución pendiente de los siguientes materiales:\n\n");
 
-        for (int i = 0; i < this.idsLibros.size(); i++) {
-            sb.append("- Título: \"").append(this.titulosLibros.get(i)).append("\" (ID: ")
-              .append(this.idsLibros.get(i)).append(")\n");
-            sb.append("  • Fecha préstamo: ").append(this.fechasPrestamo.get(i)).append("\n");
-            sb.append("  • Fecha límite: ").append(this.fechasDevolucionPrevista.get(i)).append("\n");
-            sb.append("  • Días de atraso: ").append(this.diasAtraso.get(i)).append("\n\n");
-        }
-
-        long max = maxDiasAtraso();
-        sb.append("El mayor atraso registrado es de ").append(max).append(" día(s).\n\n");
-        sb.append("Por favor, regularice su situación a la brevedad.\n\n");
-        sb.append("Saludos cordiales,\nBiblioteca INET");
-        return sb.toString();
-    }
-    
-    private String construirAsuntoConstancia() {
-        int n = this.idsLibros.size();
-        if (n <= 1) {
-            return "Constancia de devolución de libro";
-        } else {
-            return "Constancias de devolución (" + n + " préstamos)";
-        }
-    }
-    
-    private String construirCuerpoConstancia() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Estimado/a ").append(this.nombreCompletoUsuario).append(",\n\n");
-
-        if (this.idsLibros.size() == 1) {
-            sb.append("Se emite constancia de devolución del siguiente material:\n\n");
-        } else {
-            sb.append("Se emiten constancias de devolución de los siguientes materiales:\n\n");
-        }
-
-        for (int i = 0; i < this.idsLibros.size(); i++) {
-            sb.append("- Título: \"").append(this.titulosLibros.get(i)).append("\" (ID: ")
-              .append(this.idsLibros.get(i)).append(")\n");
-            sb.append("  • Fecha préstamo: ").append(this.fechasPrestamo.get(i)).append("\n");
-            sb.append("  • Fecha límite: ").append(this.fechasDevolucionPrevista.get(i)).append("\n\n");
-        }
-
-        sb.append("Fecha de emisión: ").append(this.fechaEmision.toString()).append("\n\n");
-        sb.append("Gracias por su colaboración.\n\n");
-        sb.append("Atentamente,\nBiblioteca INET");
-        return sb.toString();
-    }
-    
-    public long maxDiasAtraso() {
+    // Cuerpo para notificación de atraso
+    public static String cuerpoNotificacionAtraso(String nombreCompletoUsuario,
+                                                  int[] idsLibros,
+                                                  String[] titulosLibros,
+                                                  String[] fechasPrestamo,
+                                                  String[] fechasDevolucionPrevista,
+                                                  long[] diasAtraso) {
+        String s = "Estimado/a " + nvl(nombreCompletoUsuario) + ",\n\n" +
+                   "Le recordamos que tiene devolución pendiente de los siguientes materiales:\n\n";
         long max = 0L;
-        for (int i = 0; i < this.diasAtraso.size(); i++) {
-            Long v = this.diasAtraso.get(i);
-            if (v == null) {
-                v = 0L;
-            }
-            if (v > max) {
-                max = v;
-            }
+        int n = (idsLibros != null) ? idsLibros.length : 0;
+
+        for (int i = 0; i < n; i++) {
+            s += "- Título: \"" + nvl(getStr(titulosLibros, i)) + "\" (ID: " + getInt(idsLibros, i) + ")\n";
+            s += "  • Fecha préstamo: " + nvl(getStr(fechasPrestamo, i)) + "\n";
+            s += "  • Fecha límite: " + nvl(getStr(fechasDevolucionPrevista, i)) + "\n";
+            long d = getLong(diasAtraso, i);
+            s += "  • Días de atraso: " + d + "\n\n";
+            if (d > max) max = d;
         }
-        return max;
-    }
-    
-    public String[] dividirDestinatario() {
-        if (this.destinatario == null) {
-            return new String[0];
-        }
-        String texto = this.destinatario.trim();
-        if (texto.isEmpty()) {
-            return new String[0];
-        }
-        return texto.split("[,;\\s]+");
+
+        s += "El mayor atraso registrado es de " + max + " día(s).\n\n" +
+             "Por favor, regularice su situación a la brevedad.\n\n" +
+             "Saludos cordiales,\nBiblioteca INET";
+        return s;
     }
 
-    public static boolean esCorreoValido(String email) {
-        if (email == null) {
-            return false;
+    // Cuerpo para constancias de devolución
+    public static String cuerpoConstancia(String nombreCompletoUsuario,
+                                          int[] idsLibros,
+                                          String[] titulosLibros,
+                                          String[] fechasPrestamo,
+                                          String[] fechasDevolucionPrevista,
+                                          String fechaEmision) {
+        String s = "Estimado/a " + nvl(nombreCompletoUsuario) + ",\n\n";
+        int n = (idsLibros != null) ? idsLibros.length : 0;
+
+        if (n <= 1) {
+            s += "Se emite constancia de devolución del siguiente material:\n\n";
+        } else {
+            s += "Se emiten constancias de devolución de los siguientes materiales:\n\n";
         }
+
+        for (int i = 0; i < n; i++) {
+            s += "- Título: \"" + nvl(getStr(titulosLibros, i)) + "\" (ID: " + getInt(idsLibros, i) + ")\n";
+            s += "  • Fecha préstamo: " + nvl(getStr(fechasPrestamo, i)) + "\n";
+            s += "  • Fecha límite: " + nvl(getStr(fechasDevolucionPrevista, i)) + "\n\n";
+        }
+
+        s += "Fecha de emisión: " + nvl(fechaEmision) + "\n\n" +
+             "Gracias por su colaboración.\n\n" +
+             "Atentamente,\nBiblioteca INET";
+        return s;
+    }
+    
+    private static boolean esCorreoValido(String email) {
+        if (email == null) return false;
         return email.matches("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$");
     }
 
-    public List<String> destinatariosValidos() {
+    private static ArrayList<String> destinatariosValidos(String texto) {
         ArrayList<String> out = new ArrayList<String>();
-        String[] arr = dividirDestinatario();
+        if (texto == null) return out;
+        String t = texto.trim();
+        if (t.isEmpty()) return out;
+        String[] arr = t.split("[,;\\s]+");
         for (int i = 0; i < arr.length; i++) {
-            boolean ok = esCorreoValido(arr[i]);
-            if (ok) {
-                out.add(arr[i]);
-            }
+            if (esCorreoValido(arr[i])) out.add(arr[i]);
         }
         return out;
     }
+    
+    private static String nvl(String s) { return (s == null) ? "" : s; }
+    private static String getStr(String[] a, int i) { return (a != null && i >= 0 && i < a.length) ? a[i] : ""; }
+    private static int getInt(int[] a, int i) { return (a != null && i >= 0 && i < a.length) ? a[i] : 0; }
+    private static long getLong(long[] a, int i) { return (a != null && i >= 0 && i < a.length) ? a[i] : 0L; }
+
 	
 }
