@@ -21,7 +21,7 @@ public class Principal {
             PrincipalVista view = new PrincipalVista();
             new PrincipalControlador(view);
             view.setVisible(true);
-        });
-        */
+        });*/
+        
 	}
 }

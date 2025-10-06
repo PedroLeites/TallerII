@@ -98,7 +98,8 @@ public class ManejadoraDeDatos {
     }
     
     public void mostrarPrestamosPorUsuario(int idUsuario) {
-    	System.out.println(consultaPrestamosPorUsuario(idUsuario));
+    	Usuario u = usuarios.obtenerUsuario(idUsuario);
+    	System.out.println(u.getPrestamosDeUsuario());
     }
 
     public Datos getDatos() {
@@ -110,7 +111,7 @@ public class ManejadoraDeDatos {
     }
     
     //Test caja blanca
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
     	
     	ManejadoraDeDatos md = new ManejadoraDeDatos();
     	md.procesarCadena();
@@ -120,5 +121,5 @@ public class ManejadoraDeDatos {
     	md.mostrarPrestamosPorUsuario(637);
     	
     }
-    */
+    
 }

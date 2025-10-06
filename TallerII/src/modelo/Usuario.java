@@ -119,8 +119,7 @@ public class Usuario {
 	}
 	
 	public void mostrarAtraso() {
-		System.out.println(librosAtrasados());
-		//prestamos.mostrarColPrestamos();
+		prestamos.mostrarColPrestamos();
 	}
 
 	//toString

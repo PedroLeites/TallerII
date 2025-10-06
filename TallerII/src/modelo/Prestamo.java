@@ -9,12 +9,12 @@ public class Prestamo {
     private int idLibro; //expl_cb
     private String tituloLibro; //tit
 
-    //Constructor comï¿½n
+    //Constructor común
     public Prestamo() {
     	
     }
 
-    //Constructor especï¿½fico
+    //Constructor específico
     public Prestamo(Fecha fechaPrestamo, Fecha fechaDevolucion, int idLibro, String tituloLibro) {
         this.fechaPrestamo = fechaPrestamo;
         this.fechaDevolucionPrevista = fechaDevolucion;
