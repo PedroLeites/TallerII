@@ -78,8 +78,7 @@ public class Prestamo {
 	//toString
 	@Override
 	public String toString() {
-		return "\nPrestamo [fechaPrestamo=" + fechaPrestamo + ", fechaDevolucionPrevista=" + fechaDevolucionPrevista
-				+ ", diasRetraso=" + diasRetraso + ", idLibro=" + idLibro + ", tituloLibro=" + tituloLibro + "]";
+		return fechaPrestamo + "," + fechaDevolucionPrevista + "," + diasRetraso + "," + idLibro + "," + tituloLibro;
 	}
 	
 	public void mostrarPrestamo() {

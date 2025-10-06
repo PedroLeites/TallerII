@@ -98,8 +98,7 @@ public class ManejadoraDeDatos {
     }
     
     public void mostrarPrestamosPorUsuario(int idUsuario) {
-    	Usuario u = usuarios.obtenerUsuario(idUsuario);
-    	System.out.println(u.getPrestamosDeUsuario());
+    	usuarios.obtenerUsuario(idUsuario).mostrarAtraso();
     }
 
     public Datos getDatos() {
@@ -117,7 +116,9 @@ public class ManejadoraDeDatos {
     	md.procesarCadena();
     	Usuario u = md.obtenerUsuarios().obtenerUsuario(637);
     	System.out.println(u);
+    	System.out.println("");
     	System.out.println("Prueba de mostrar prestamos atrasados de por usuario");
+    	System.out.println("Prestamos atrasados del usuario 637:");
     	md.mostrarPrestamosPorUsuario(637);
     	
     }

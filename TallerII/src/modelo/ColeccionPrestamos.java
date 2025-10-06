@@ -95,7 +95,7 @@ public class ColeccionPrestamos {
     //toString
     @Override
     public String toString() {
-    	return "Prestamos {" + prestamos + "}";
+    	return prestamos + "";
     }
     
     public void mostrarColPrestamos() {
