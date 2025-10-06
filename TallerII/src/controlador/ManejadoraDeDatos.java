@@ -92,11 +92,6 @@ public class ManejadoraDeDatos {
         procesarCadena();
     }
     
-    public String consultaPrestamosPorUsuario(int idUsuario) {
-    	Usuario u = usuarios.obtenerUsuario(idUsuario);
-    	return u.librosAtrasados();
-    }
-    
     public void mostrarPrestamosPorUsuario(int idUsuario) {
     	usuarios.obtenerUsuario(idUsuario).mostrarAtraso();
     }
@@ -107,6 +102,18 @@ public class ManejadoraDeDatos {
     
     public ColeccionUsuarios obtenerUsuarios() {
         return usuarios;
+    }
+    
+    public Usuario obtenerUsuarioPorId(int id) {
+    	return usuarios.obtenerUsuario(id);
+    }
+    
+    public ColeccionPrestamos obtenerPrestamosDeUsuario(int idUsuario) {
+        Usuario u = obtenerUsuarioPorId(idUsuario);
+        if (u == null) {
+            return null;
+        }
+        return u.getPrestamosDeUsuario();
     }
     
     //Test caja blanca

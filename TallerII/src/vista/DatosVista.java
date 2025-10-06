@@ -106,8 +106,8 @@ public class DatosVista extends JFrame {
 		        return;
 		    }
 
-		    //Asegurar datos cargados
-			ColeccionUsuarios cu = this.controladorDatos.obtenerUsuarios();
+		    //Verifica si los datos ya están cargados
+		    modelo.ColeccionUsuarios cu = this.controladorDatos.obtenerUsuarios();
 		    if (cu == null || cu.vacia()) {
 		        try {
 		            this.controladorDatos.cargarDatos();           //intenta cargar
@@ -122,74 +122,24 @@ public class DatosVista extends JFrame {
 		        }
 		    }
 
-		    // Consultar cadena tokenizada
-		    String cadena = this.controladorDatos.consultaPrestamosPorUsuario(id);
+		    //Busca por id de usuario
 		    limpiarTabla();
-		    
-		    if (cadena == null || cadena.trim().isEmpty()) {
-		        // No existe usuario o no tiene préstamos
-		        if (!cu.pertenece(id)) {
-		            mostrarInfo("No existe un usuario con ese ID.");
-		        } else {
-		            mostrarInfo("El usuario no tiene préstamos para mostrar.");
-		        }
+		    modelo.Usuario u = this.controladorDatos.obtenerUsuarioPorId(id);
+		    if (u == null) {
+		        mostrarInfo("No existe un usuario con ese ID.");
 		        return;
 		    }
 
-		    // Parsear filas: separador ';'
-		    String[] filas = cadena.split(";");
-		    for (String fila : filas) {
-		        String f = fila.trim();
-		        if (f.isEmpty()) continue;
+		    //Muestra préstamos
+		    modelo.ColeccionPrestamos cp = this.controladorDatos.obtenerPrestamosDeUsuario(id);
+		    if (cp == null || cp.vacia()) {
+		        mostrarInfo("El usuario no tiene préstamos para mostrar.");
+		        return;
+		    }
 
-		        // Parsear columnas: separador ','
-		        String[] c = f.split(",", -1); // -1 para no perder vacíos
-		        if (c.length < 9) {
-		            // Fila mal formada, la salteamos
-		            continue;
-		        }
-
-		        // Indices (deben coincidir con el formato que generamos):
-		        // 0: fechaPrestamo
-		        // 1: fechaDevolucion
-		        // 2: diasRetraso
-		        // 3: idUsuario
-		        // 4: nombre
-		        // 5: apellido
-		        // 6: correo
-		        // 7: titulo
-		        // 8: idLibro
-
-		        try {
-		            // Construir objetos para reutilizar tu agregarFila(Usuario, Prestamo)
-		            modelo.Usuario u = new modelo.Usuario(
-		                Integer.parseInt(c[3].trim()),
-		                0, // CI no viene en la cadena; dejamos 0
-		                c[4].trim(),
-		                c[5].trim(),
-		                c[6].trim()
-		            );
-
-		            modelo.Prestamo p = new modelo.Prestamo(
-		                new modelo.Fecha(c[0].trim()),
-		                new modelo.Fecha(c[1].trim()),
-		                Integer.parseInt(c[8].trim()),
-		                c[7].trim()
-		            );
-
-		            // (Opcional) Si querés forzar el valor de días de retraso al devuelto en la cadena:
-		            try {
-		                long dias = Long.parseLong(c[2].trim());
-		                p.setDiasRetraso(dias);
-		            } catch (NumberFormatException ignore) {
-		                // si no parsea, queda el calculado por el constructor
-		            }
-
-		            agregarFila(u, p);
-		        } catch (Exception exFila) {
-		            // fila con datos inválidos: la ignoramos para no frenar al usuario
-		            System.err.println("Fila inválida al parsear búsqueda por ID: " + exFila.getMessage());
-		        }
+		    for (int i = 0; i < cp.largo(); i++) {
+		        modelo.Prestamo p = cp.obtenerPrestamoPorPosicion(i);
+		        agregarFila(u, p);
 		    }
 		    
 		});

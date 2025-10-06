@@ -91,33 +91,6 @@ public class Usuario {
         prestamos.agregarPrestamo(p);
     }
 	
-	public String librosAtrasados() {
-		String resultado = "";
-		if (prestamos == null || prestamos.vacia()) {
-			resultado = "-";
-		}
-		
-		for (int i = 0; i < prestamos.largo(); i++) {
-			 Prestamo p = prestamos.obtenerPrestamoPorPosicion(i);
-			 resultado += p.getFechaPrestamo() + ","
-			            + p.getFechaDevolucionPrevista() + ","
-			            + p.getDiasRetraso() + ","
-			            + this.id + ","
-			            + limpiar(this.nombre) + ","
-			            + limpiar(this.apellido) + ","
-			            + limpiar(this.correo) + ","
-			            + limpiar(p.getTituloLibro()) + ","
-			            + p.getIdLibro() + ";";
-		}
-		
-		return resultado;
-	}
-	
-	// Evita que comas/; de los títulos rompan la vista
-	private String limpiar(String s) {
-	    return (s == null) ? "" : s.replace(",", " ").replace(";", " ");
-	}
-	
 	public void mostrarAtraso() {
 		prestamos.mostrarColPrestamos();
 	}
