@@ -5,6 +5,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import controlador.ManejadoraDeDatos;
 import controlador.ManejadoraDeCorreos;
@@ -29,6 +31,7 @@ public class DatosVista extends JFrame {
     private JButton btnNotifUsuario = new JButton("Notificar atraso (usuario)");
     private JButton btnConstFila = new JButton("Constancia (fila)");
     private JButton btnConstUsuario = new JButton("Constancias (usuario)");
+    private JButton btnNotifTodos = new JButton("Notificar a todos");
 	
 	JPanel panelBotones = new JPanel();
 	JPanel panelCorreo = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -56,6 +59,7 @@ public class DatosVista extends JFrame {
         
         this.add(panelBotones, BorderLayout.SOUTH);
         
+        panelCorreo.add(btnNotifTodos);
         panelCorreo.add(btnNotifFila);
         panelCorreo.add(btnNotifUsuario);
         panelCorreo.add(btnConstFila);
@@ -169,11 +173,9 @@ public class DatosVista extends JFrame {
                 controladorCorreos.enviarNotificacionAtrasoPorPrestamo(
                     destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev, dias
                 );
-                JOptionPane.showMessageDialog(this, "Notificación enviada correctamente.", "Éxito",
-                                              JOptionPane.INFORMATION_MESSAGE);
+                mostrarInfo("Notificación enviada correctamente.");
             } catch (RuntimeException ex) {
-                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación.\n" + ex.getMessage(),
-                                              "Error", JOptionPane.ERROR_MESSAGE);
+            	mostrarError("No se pudo enviar la notificación.\n" + ex.getMessage());
             }
             
         });
@@ -217,11 +219,9 @@ public class DatosVista extends JFrame {
             	controladorCorreos.enviarNotificacionAtrasoPorUsuario(
                         destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev, dias
                     );
-                JOptionPane.showMessageDialog(this, "Notificación enviada correctamente.", "Éxito",
-                                              JOptionPane.INFORMATION_MESSAGE);
+            	mostrarInfo("Notificación enviada correctamente.");
             } catch (RuntimeException ex) {
-                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación.\n" + ex.getMessage(),
-                                              "Error", JOptionPane.ERROR_MESSAGE);
+            	mostrarError("No se pudo enviar la notificación.\n" + ex.getMessage());
             }
        
         });
@@ -246,11 +246,9 @@ public class DatosVista extends JFrame {
             	controladorCorreos.enviarConstanciaPorPrestamo(
                         destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev
                     );
-                JOptionPane.showMessageDialog(this, "Notificación enviada correctamente.", "Éxito",
-                                              JOptionPane.INFORMATION_MESSAGE);
+            	mostrarInfo("Notificación enviada correctamente.");
             } catch (RuntimeException ex) {
-                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación.\n" + ex.getMessage(),
-                                              "Error", JOptionPane.ERROR_MESSAGE);
+            	mostrarError("No se pudo enviar la notificación.\n" + ex.getMessage());
             }
             
         });
@@ -292,15 +290,59 @@ public class DatosVista extends JFrame {
             	controladorCorreos.enviarConstanciasPorUsuario(
                         destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev
                     );
-                JOptionPane.showMessageDialog(this, "Notificación enviada correctamente.", "Éxito",
-                                              JOptionPane.INFORMATION_MESSAGE);
+            	mostrarInfo("Notificación enviada correctamente.");
             } catch (RuntimeException ex) {
-                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación.\n" + ex.getMessage(),
-                                              "Error", JOptionPane.ERROR_MESSAGE);
+            	mostrarError("No se pudo enviar la notificación.\n" + ex.getMessage());
             }
             
         });
-	}
+        
+        //Enviar notificación de atraso a todos los usuarios
+        btnNotifTodos.addActionListener(e -> {
+        	int total = modeloTabla.getRowCount();
+            if (total == 0) {
+                mostrarInfo("No hay datos cargados para notificar.");
+                return;
+            }
+            
+            //Agrupar filas por ID de usuario
+            Map<Integer, ManejadoraDeCorreos.DatosUsuarioAtraso> mapa = new HashMap<>();
+            
+            for (int r = 0; r < total; r++) {
+            	int idUsuario = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(r, 3)));
+                String destinatario = String.valueOf(modeloTabla.getValueAt(r, 5));
+                String nombre = String.valueOf(modeloTabla.getValueAt(r, 4));
+                int idLibro = Integer.parseInt(String.valueOf(modeloTabla.getValueAt(r, 7)));
+                String titulo = String.valueOf(modeloTabla.getValueAt(r, 6));
+                String fPrest = String.valueOf(modeloTabla.getValueAt(r, 0));
+                String fDev = String.valueOf(modeloTabla.getValueAt(r, 1));
+                long dias = Long.parseLong(String.valueOf(modeloTabla.getValueAt(r, 2)));
+
+                ManejadoraDeCorreos.DatosUsuarioAtraso dato = mapa.get(idUsuario);
+                if (dato == null) {
+                    dato = new ManejadoraDeCorreos.DatosUsuarioAtraso();
+                    dato.destinatario = destinatario;
+                    dato.nombre = nombre;
+                    mapa.put(idUsuario, dato);
+                }
+                dato.ids.add(idLibro);
+                dato.titulos.add(titulo);
+                dato.fPrest.add(fPrest);
+                dato.fDev.add(fDev);
+                dato.dias.add(dias);
+            }
+            
+            //Enviar a todos
+            try {
+                controladorCorreos.enviarNotificacionesAtrasoATodos(mapa);
+                mostrarInfo("Se enviaron las notificaciones a todos los usuarios visibles.");
+            } catch (RuntimeException ex) {
+            	mostrarError("Ocurrió un error al enviar algunas notificaciones.\n" + ex.getMessage());
+            }
+            
+        });
+        
+}
 	
     public void agregarFila(Usuario usuario, Prestamo prestamo) { 
     	this.modeloTabla.addRow(new Object[] {

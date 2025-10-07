@@ -6,6 +6,9 @@ import modelo.ColeccionHistorial;
 import modelo.Fecha;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+import java.util.Iterator;
 
 public class ManejadoraDeCorreos {
 	private ColeccionHistorial coleccionHistorial;
@@ -186,5 +189,40 @@ public class ManejadoraDeCorreos {
     	Historial historial = new Historial(idUsuario, correo);
     	coleccionHistorial.agregarHistorial(historial);
     }
+    
+    public void enviarNotificacionesAtrasoATodos(Map<Integer, DatosUsuarioAtraso> mapa) {
+
+        Set<Integer> ids = mapa.keySet();
+        Iterator<Integer> it = ids.iterator();
+
+        while (it.hasNext()) {
+            Integer idUsuario = it.next();
+            DatosUsuarioAtraso d = mapa.get(idUsuario);
+            //d.destinatario, d.nombre, d.ids, d.titulos, d.fPrest, d.fDev, d.dias
+
+            this.enviarNotificacionAtrasoPorUsuario(
+                    d.destinatario,
+                    idUsuario,
+                    d.nombre,
+                    d.ids,
+                    d.titulos,
+                    d.fPrest,
+                    d.fDev,
+                    d.dias
+            );
+        }
+    }
+
+    //POJO auxiliar para agrupar préstamos por usuario
+    public static class DatosUsuarioAtraso {
+        public String destinatario;
+        public String nombre;
+        public java.util.ArrayList<Integer> ids = new java.util.ArrayList<>();
+        public java.util.ArrayList<String> titulos = new java.util.ArrayList<>();
+        public java.util.ArrayList<String> fPrest = new java.util.ArrayList<>();
+        public java.util.ArrayList<String> fDev = new java.util.ArrayList<>();
+        public java.util.ArrayList<Long> dias = new java.util.ArrayList<>();
+    }
+
   
 }
