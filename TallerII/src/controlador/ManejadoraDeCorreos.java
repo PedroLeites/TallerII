@@ -70,7 +70,7 @@ public class ManejadoraDeCorreos {
     	String cuerpo = Correo.cuerpoConstancia(nombreCompleto,ids,titulos,fPrest,fDev,fechaEmision);
 
     	// 3) Instanciar Correo => envía
-    	Correo correo = new Correo(destinatario, asunto, cuerpo);
+    	Correo correo = new Correo(Correo.Tipo.CONSTANCIA_DEVOLUCION,destinatario, asunto, cuerpo);
 
     	// 4) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
@@ -102,7 +102,7 @@ public class ManejadoraDeCorreos {
     	String cuerpo = Correo.cuerpoConstancia(nombreCompleto,idsLibros,titulosLibros,fechasPrestamo,fechasDevolucionPrevista,fechaEmision);
 
     	// 4) Instanciar Correo => envía
-    	Correo correo = new Correo(destinatario, asunto, cuerpo);
+    	Correo correo = new Correo(Correo.Tipo.CONSTANCIA_DEVOLUCION,destinatario, asunto, cuerpo);
 
     	// 5) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
@@ -152,7 +152,7 @@ public class ManejadoraDeCorreos {
     	String cuerpo = Correo.cuerpoNotificacionAtraso(nombreCompleto, ids, titulos, fPrest, fDev, atrasos);
 
     	// 3) Instanciar Correo => envía
-    	Correo correo = new Correo(destinatario, asunto, cuerpo);
+    	Correo correo = new Correo(Correo.Tipo.NOTIFICACION_ATRASO,destinatario, asunto, cuerpo);
 
     	// 4) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
@@ -183,7 +183,7 @@ public class ManejadoraDeCorreos {
     	String cuerpo = Correo.cuerpoNotificacionAtraso(nombreCompleto,idsLibros,titulosLibros,fechasPrestamo,fechasDevolucionPrevista,diasAtraso);
 
     	// 4) Instanciar Correo => envía
-    	Correo correo = new Correo(destinatario, asunto, cuerpo);
+    	Correo correo = new Correo(Correo.Tipo.NOTIFICACION_ATRASO,destinatario, asunto, cuerpo);
 
     	// 5) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);

@@ -11,7 +11,8 @@ import java.util.ArrayList;
 public class Correo {
 	public enum Tipo {NOTIFICACION_ATRASO, CONSTANCIA_DEVOLUCION}
 
-    private Fecha fechaEmision;
+    private Tipo tipo;
+	private Fecha fechaEmision;
     private String destinatario;
     private String remitente;
     private String contrasenia;
@@ -23,9 +24,11 @@ public class Correo {
         
     }
     
-    public Correo(String destinatario, String asunto, String mensaje) {
+    public Correo(Tipo tipo, String destinatario, String asunto, String mensaje) {
     	LocalDate hoy = LocalDate.now();
     	this.fechaEmision = new Fecha(hoy.getDayOfMonth(), hoy.getMonthValue(), hoy.getYear());
+    	
+    	this.tipo = tipo;
     	
     	this.destinatario = destinatario;
     	
@@ -51,6 +54,9 @@ public class Correo {
 
     public String getMensaje() { return mensaje; }
     public void setMensaje(String cuerpo) { this.mensaje = cuerpo; }
+    
+    public Tipo getTipo() { return tipo; }
+    public void setTipo(Tipo tipo) { this.tipo = tipo; }
     
     //Métodos Específicos
     private void enviar() {
