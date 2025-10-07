@@ -5,6 +5,7 @@ import javax.mail.internet.*;
 import java.util.Properties;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.ArrayList;
 
 public class Correo {
@@ -132,13 +133,12 @@ public class Correo {
 	}
  	
     // Cuerpo para notificación de atraso
- 	public static String cuerpoNotificacionAtraso(
- 			String nombreCompletoUsuario,
-            int[] idsLibros,
-            String[] titulosLibros,
-            String[] fechasPrestamo,
-            String[] fechasDevolucionPrevista,
-            long[] diasAtraso) {
+ 	public static String cuerpoNotificacionAtraso(String nombreCompletoUsuario,
+ 													List<Integer> idsLibros,
+ 													List<String> titulosLibros,
+ 													List<String> fechasPrestamo,
+ 													List<String> fechasDevolucionPrevista,
+ 													List<Long> diasAtraso) {
 
  		String nombreSeguro;
  		if (nombreCompletoUsuario == null) {
@@ -151,53 +151,74 @@ public class Correo {
  		cuerpo.append("Estimado/a ").append(nombreSeguro).append(",\n\n");
  		cuerpo.append("Le recordamos que tiene devolución pendiente de los siguientes materiales:\n\n");
 
- 		long mayorAtraso = 0L;
-
  		int cantidadElementos;
  		if (idsLibros == null) {
  			cantidadElementos = 0;
  		} else {
- 			cantidadElementos = idsLibros.length;
+ 			cantidadElementos = idsLibros.size();
  		}
+
+ 		long mayorAtraso = 0L;
 
  		int i = 0;
  		while (i < cantidadElementos) {
- 			// Título seguro
+ 			// id
+ 			int idSeguro;
+ 			Integer idObj = idsLibros.get(i);
+ 			if (idObj == null) {
+ 				idSeguro = 0;
+ 			} else {
+ 				idSeguro = idObj;
+ 			}
+
+ 			// título
  			String tituloSeguro;
- 			if (titulosLibros != null && i >= 0 && i < titulosLibros.length && titulosLibros[i] != null) {
- 				tituloSeguro = titulosLibros[i];
+ 			if (titulosLibros != null && titulosLibros.size() > i) {
+ 				String titulo = titulosLibros.get(i);
+ 				if (titulo == null) {
+ 					tituloSeguro = "";
+ 				} else {
+ 					tituloSeguro = titulo;
+ 				}
  			} else {
  				tituloSeguro = "";
  			}
 
- 			// Fecha préstamo segura
+ 			// fecha préstamo
  			String fechaPrestamoSegura;
- 			if (fechasPrestamo != null && i >= 0 && i < fechasPrestamo.length && fechasPrestamo[i] != null) {
- 				fechaPrestamoSegura = fechasPrestamo[i];
+ 			if (fechasPrestamo != null && fechasPrestamo.size() > i) {
+ 				String fp = fechasPrestamo.get(i);
+ 				if (fp == null) {
+ 					fechaPrestamoSegura = "";
+ 				} else {
+ 					fechaPrestamoSegura = fp;
+ 				}
  			} else {
  				fechaPrestamoSegura = "";
  			}
 
- 			// Fecha devolución prevista segura
+ 			// fecha devolución prevista
  			String fechaDevolucionSegura;
- 			if (fechasDevolucionPrevista != null && i >= 0 && i < fechasDevolucionPrevista.length && fechasDevolucionPrevista[i] != null) {
- 				fechaDevolucionSegura = fechasDevolucionPrevista[i];
+ 			if (fechasDevolucionPrevista != null && fechasDevolucionPrevista.size() > i) {
+ 				String fd = fechasDevolucionPrevista.get(i);
+ 				if (fd == null) {
+ 					fechaDevolucionSegura = "";
+ 				} else {
+ 					fechaDevolucionSegura = fd;
+ 				}
  			} else {
  				fechaDevolucionSegura = "";
  			}
 
- 			// ID seguro
- 			int idSeguro;
- 			if (idsLibros != null && i >= 0 && i < idsLibros.length) {
- 				idSeguro = idsLibros[i];
- 			} else {
- 				idSeguro = 0;
- 			}
-
- 			// Días de atraso seguros
+ 			// días de atraso
  			long diasAtrasoSeguro;
- 			if (diasAtraso != null && i >= 0 && i < diasAtraso.length) {
- 				diasAtrasoSeguro = diasAtraso[i];
+ 			if (diasAtraso != null && diasAtraso.size() > i) {
+ 				Long d = diasAtraso.get(i);
+ 				if (d == null) {
+ 					diasAtrasoSeguro = 0L;
+ 				} else {
+ 					diasAtrasoSeguro = d;
+ 				}
  			} else {
  				diasAtrasoSeguro = 0L;
  			}
@@ -221,14 +242,14 @@ public class Correo {
  		return cuerpo.toString();
  	}
 
+
  	//Cuerpo para constancias de devolución
- 	public static String cuerpoConstancia(
- 			String nombreCompletoUsuario,
- 			int[] idsLibros,
- 			String[] titulosLibros,
- 			String[] fechasPrestamo,
- 			String[] fechasDevolucionPrevista,
- 			String fechaEmision) {
+ 	public static String cuerpoConstancia(String nombreCompletoUsuario,
+ 											List<Integer> idsLibros,
+ 											List<String> titulosLibros,
+ 											List<String> fechasPrestamo,
+ 											List<String> fechasDevolucionPrevista,
+ 											String fechaEmision) {
 
  		String nombreSeguro;
  		if (nombreCompletoUsuario == null) {
@@ -251,7 +272,7 @@ public class Correo {
  		if (idsLibros == null) {
  			cantidadElementos = 0;
  		} else {
- 			cantidadElementos = idsLibros.length;
+ 			cantidadElementos = idsLibros.size();
  		}
 
  		if (cantidadElementos <= 1) {
@@ -262,36 +283,52 @@ public class Correo {
 
  		int i = 0;
  		while (i < cantidadElementos) {
- 			// Título seguro
+ 			// id
+ 			int idSeguro;
+ 			Integer idObj = idsLibros.get(i);
+ 			if (idObj == null) {
+ 				idSeguro = 0;
+ 			} else {
+ 				idSeguro = idObj;
+ 			}
+
+ 			// título
  			String tituloSeguro;
- 			if (titulosLibros != null && i >= 0 && i < titulosLibros.length && titulosLibros[i] != null) {
- 				tituloSeguro = titulosLibros[i];
+ 			if (titulosLibros != null && titulosLibros.size() > i) {
+ 				String titulo = titulosLibros.get(i);
+ 				if (titulo == null) {
+ 					tituloSeguro = "";
+ 				} else {
+ 					tituloSeguro = titulo;
+ 				}
  			} else {
  				tituloSeguro = "";
  			}
 
- 			// Fecha préstamo segura
+ 			// fecha préstamo
  			String fechaPrestamoSegura;
- 			if (fechasPrestamo != null && i >= 0 && i < fechasPrestamo.length && fechasPrestamo[i] != null) {
- 				fechaPrestamoSegura = fechasPrestamo[i];
+ 			if (fechasPrestamo != null && fechasPrestamo.size() > i) {
+ 				String fp = fechasPrestamo.get(i);
+ 				if (fp == null) {
+ 					fechaPrestamoSegura = "";
+ 				} else {
+ 					fechaPrestamoSegura = fp;
+ 				}
  			} else {
  				fechaPrestamoSegura = "";
  			}
 
- 			// Fecha devolución prevista segura
+ 			// fecha devolución prevista
  			String fechaDevolucionSegura;
- 			if (fechasDevolucionPrevista != null && i >= 0 && i < fechasDevolucionPrevista.length && fechasDevolucionPrevista[i] != null) {
- 				fechaDevolucionSegura = fechasDevolucionPrevista[i];
+ 			if (fechasDevolucionPrevista != null && fechasDevolucionPrevista.size() > i) {
+ 				String fd = fechasDevolucionPrevista.get(i);
+ 				if (fd == null) {
+ 					fechaDevolucionSegura = "";
+ 				} else {
+ 					fechaDevolucionSegura = fd;
+ 				}
  			} else {
  				fechaDevolucionSegura = "";
- 			}
-
- 			// ID seguro
- 			int idSeguro;
- 			if (idsLibros != null && i >= 0 && i < idsLibros.length) {
- 				idSeguro = idsLibros[i];
- 			} else {
- 				idSeguro = 0;
  			}
 
  			cuerpo.append("- Título: \"").append(tituloSeguro).append("\" (ID: ").append(idSeguro).append(")\n");
@@ -307,6 +344,7 @@ public class Correo {
 
  		return cuerpo.toString();
  	}
+
 
  	//Valida una dirección de correo con una expresión regular simple
  	private static boolean esCorreoValido(String email) {
