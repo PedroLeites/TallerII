@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="C:/Users/pedro/OneDrive/Documentos/GitHub/TallerII/TallerII/libs/APACHE POI 4.1.2/xmlbeans-3.1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/pedro/OneDrive/Documentos/GitHub/TallerII/TallerII/libs/JXL/jxl-2.6.12.jar"/>
 	<classpathentry kind="lib" path="C:/Users/pedro/OneDrive/Documentos/GitHub/TallerII/TallerII/libs/JavaMail/javax.mail.jar"/>
+	<classpathentry kind="lib" path="C:/Users/pedro/OneDrive/Documentos/GitHub/TallerII/TallerII/libs/MySQL Connector/mysql-connector-java-5.1.49.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
