@@ -34,8 +34,10 @@ public class ManejadoraDeCorreos {
             								String fechaPrestamo,
             								String fechaDevolucionPrevista) {
 
+    	// 1) Asumto
     	String asunto = Correo.asuntoPara(Correo.Tipo.CONSTANCIA_DEVOLUCION, 1);
 
+    	// 2) Cuerpo
     	ArrayList<Integer> ids = new ArrayList<Integer>();
     	ids.add(idLibro);
 
@@ -64,8 +66,10 @@ public class ManejadoraDeCorreos {
 
     	String cuerpo = Correo.cuerpoConstancia(nombreCompleto,ids,titulos,fPrest,fDev,fechaEmision);
 
+    	// 3) Instanciar Correo => envía
     	Correo correo = new Correo(destinatario, asunto, cuerpo);
 
+    	// 4) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
     	coleccionHistorial.agregarHistorial(historial);
     }
@@ -78,6 +82,7 @@ public class ManejadoraDeCorreos {
             								ArrayList<String> fechasPrestamo,
             								ArrayList<String> fechasDevolucionPrevista) {
 
+    	// 1) Controlar cantidad de elementos (ejemplares que debe el usuario) 
     	int cantidadElementos;
     	if (idsLibros == null) {
     		cantidadElementos = 0;
@@ -85,14 +90,18 @@ public class ManejadoraDeCorreos {
     		cantidadElementos = idsLibros.size();
     	}
 
+    	// 2) Asunto
     	String asunto = Correo.asuntoPara(Correo.Tipo.CONSTANCIA_DEVOLUCION, cantidadElementos);
 
+    	// 3) Cuerpo
     	String fechaEmision = new Fecha().toString();
 
     	String cuerpo = Correo.cuerpoConstancia(nombreCompleto,idsLibros,titulosLibros,fechasPrestamo,fechasDevolucionPrevista,fechaEmision);
 
+    	// 4) Instanciar Correo => envía
     	Correo correo = new Correo(destinatario, asunto, cuerpo);
 
+    	// 5) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
     	coleccionHistorial.agregarHistorial(historial);
     }
@@ -106,8 +115,10 @@ public class ManejadoraDeCorreos {
             										String fechaDevolucionPrevista,
             										long diasAtraso) {
 
+    	// 1) Asunto
     	String asunto = Correo.asuntoPara(Correo.Tipo.NOTIFICACION_ATRASO, 1);
 
+    	// 2) Cuerpo
     	ArrayList<Integer> ids = new ArrayList<Integer>();
     	ids.add(idLibro);
 
@@ -137,8 +148,10 @@ public class ManejadoraDeCorreos {
 
     	String cuerpo = Correo.cuerpoNotificacionAtraso(nombreCompleto, ids, titulos, fPrest, fDev, atrasos);
 
+    	// 3) Instanciar Correo => envía
     	Correo correo = new Correo(destinatario, asunto, cuerpo);
 
+    	// 4) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
     	coleccionHistorial.agregarHistorial(historial);
     }
@@ -152,6 +165,7 @@ public class ManejadoraDeCorreos {
             										ArrayList<String> fechasDevolucionPrevista,
             										ArrayList<Long> diasAtraso) {
 
+    	// 1) Controlar cantidad de elementos (ejemplares que debe el usuario)
     	int cantidadElementos;
     	if (idsLibros == null) {
     		cantidadElementos = 0;
@@ -159,12 +173,16 @@ public class ManejadoraDeCorreos {
     		cantidadElementos = idsLibros.size();
     	}
 
+    	// 2) Asunto
     	String asunto = Correo.asuntoPara(Correo.Tipo.NOTIFICACION_ATRASO, cantidadElementos);
 
+    	// 3) Cuerpo
     	String cuerpo = Correo.cuerpoNotificacionAtraso(nombreCompleto,idsLibros,titulosLibros,fechasPrestamo,fechasDevolucionPrevista,diasAtraso);
 
+    	// 4) Instanciar Correo => envía
     	Correo correo = new Correo(destinatario, asunto, cuerpo);
 
+    	// 5) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
     	coleccionHistorial.agregarHistorial(historial);
     }

@@ -165,12 +165,17 @@ public class DatosVista extends JFrame {
             String fDev = String.valueOf(modeloTabla.getValueAt(row, 1));
             long dias = Long.parseLong(String.valueOf(modeloTabla.getValueAt(row, 2)));
 
-            controladorCorreos.enviarNotificacionAtrasoPorPrestamo(
+            try {
+                controladorCorreos.enviarNotificacionAtrasoPorPrestamo(
                     destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev, dias
                 );
-
-                JOptionPane.showMessageDialog(this, "Se intentó enviar la notificación (fila).", "Aviso",
-                        JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Notificación enviada correctamente.", "Éxito",
+                                              JOptionPane.INFORMATION_MESSAGE);
+            } catch (RuntimeException ex) {
+                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación.\n" + ex.getMessage(),
+                                              "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
         });
         
      // Notificar atraso por usuario (todas las filas visibles del mismo ID)
@@ -208,12 +213,17 @@ public class DatosVista extends JFrame {
                 return;
             }
 
-            controladorCorreos.enviarNotificacionAtrasoPorUsuario(
-                    destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev, dias
-                );
-
-                JOptionPane.showMessageDialog(this, "Se intentó enviar la notificación (usuario).", "Aviso",
-                        JOptionPane.INFORMATION_MESSAGE);
+            try {
+            	controladorCorreos.enviarNotificacionAtrasoPorUsuario(
+                        destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev, dias
+                    );
+                JOptionPane.showMessageDialog(this, "Notificación enviada correctamente.", "Éxito",
+                                              JOptionPane.INFORMATION_MESSAGE);
+            } catch (RuntimeException ex) {
+                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación.\n" + ex.getMessage(),
+                                              "Error", JOptionPane.ERROR_MESSAGE);
+            }
+       
         });
 
         // Constancia por préstamo (fila)
@@ -231,13 +241,18 @@ public class DatosVista extends JFrame {
             String titulo = String.valueOf(modeloTabla.getValueAt(row, 6));
             String fPrest = String.valueOf(modeloTabla.getValueAt(row, 0));
             String fDev = String.valueOf(modeloTabla.getValueAt(row, 1));
-
-            controladorCorreos.enviarConstanciaPorPrestamo(
-                    destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev
-                );
-
-                JOptionPane.showMessageDialog(this, "Se intentó enviar la constancia (fila).", "Aviso",
-                        JOptionPane.INFORMATION_MESSAGE);
+  
+            try {
+            	controladorCorreos.enviarConstanciaPorPrestamo(
+                        destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev
+                    );
+                JOptionPane.showMessageDialog(this, "Notificación enviada correctamente.", "Éxito",
+                                              JOptionPane.INFORMATION_MESSAGE);
+            } catch (RuntimeException ex) {
+                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación.\n" + ex.getMessage(),
+                                              "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
         });
 
         // Constancias por usuario (todas las filas visibles del mismo ID)
@@ -272,13 +287,18 @@ public class DatosVista extends JFrame {
                 mostrarInfo("No hay préstamos visibles para ese usuario.");
                 return;
             }
-
-            controladorCorreos.enviarConstanciasPorUsuario(
-                    destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev
-                );
-
-                JOptionPane.showMessageDialog(this, "Se intentó enviar las constancias (usuario).", "Aviso",
-                        JOptionPane.INFORMATION_MESSAGE);
+ 
+            try {
+            	controladorCorreos.enviarConstanciasPorUsuario(
+                        destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev
+                    );
+                JOptionPane.showMessageDialog(this, "Notificación enviada correctamente.", "Éxito",
+                                              JOptionPane.INFORMATION_MESSAGE);
+            } catch (RuntimeException ex) {
+                JOptionPane.showMessageDialog(this, "No se pudo enviar la notificación.\n" + ex.getMessage(),
+                                              "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
         });
 	}
 	

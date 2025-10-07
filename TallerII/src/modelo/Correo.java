@@ -54,19 +54,25 @@ public class Correo {
     
     //Métodos Específicos
     private void enviar() {
-    	
-		
-		try {
+    	boolean ok = enviarInterno();
+    	if (!ok) {
+    		throw new RuntimeException("No se pudo enviar el correo.");
+    	}
+    }
+    
+    private boolean enviarInterno() {
+    	boolean seMando = true;
+    	try {
 			//Controlar celdas con varias direcciones de correo
 			ArrayList<String> destinos = destinatariosValidos(this.destinatario);
             if (destinos.isEmpty()) {
                 System.err.println("Correo: no hay destinatarios válidos.");
-                return;
+                seMando = false;
             }
             
             if (this.remitente.isEmpty() || this.contrasenia.isEmpty()) {
                 System.err.println("Correo: remitente o contraseña no configurados.");
-                return;
+                seMando = false;
             }
 			
 			//Configuración para conectarse al servidor SMTP de Gmail
@@ -97,12 +103,14 @@ public class Correo {
             msj.setText(mensaje);
 
             Transport.send(msj);
-    		
+            seMando = true;	
             System.out.println("Mensaje enviado con éxito");
             
 		} catch (MessagingException e) {
     		e.printStackTrace();
+    		seMando = false;
     	}
+    	return seMando;
     }
     
  @Override
