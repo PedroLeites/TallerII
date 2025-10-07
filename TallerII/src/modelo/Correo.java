@@ -111,92 +111,247 @@ public class Correo {
 	}
 
 	// Asuntos
-    public static String asuntoPara(Tipo tipo, int cantidadPrestamos) {
-        if (tipo == Tipo.CONSTANCIA_DEVOLUCION) {
-            return (cantidadPrestamos <= 1) ? "Constancia de devolución de libro"
-                                            : "Constancias de devolución (" + cantidadPrestamos + " préstamos)";
-        }
-        // NOTIFICACION_ATRASO
-        return (cantidadPrestamos <= 1) ? "Notificación de devolución pendiente"
-                                        : "Notificación de devolución pendiente (" + cantidadPrestamos + " préstamos)";
-    }
+ 	public static String asuntoPara(Tipo tipo, int cantidadPrestamos) {
+ 		String asunto;
+ 		if (tipo == Tipo.CONSTANCIA_DEVOLUCION) {
+ 			if (cantidadPrestamos <= 1) {
+ 				asunto = "Constancia de devolución de libro";
+	        } else {
+	            asunto = "Constancias de devolución (" + cantidadPrestamos + " préstamos)";
+	        }
+ 		} else {
+	        // Caso: NOTIFICACION_ATRASO
+	        if (cantidadPrestamos <= 1) {
+	            asunto = "Notificación de devolución pendiente";
+	        } else {
+	            asunto = "Notificación de devolución pendiente (" + cantidadPrestamos + " préstamos)";
+	        }
+	    }
 
+	    return asunto;
+	}
+ 	
     // Cuerpo para notificación de atraso
-    public static String cuerpoNotificacionAtraso(String nombreCompletoUsuario,
-                                                  int[] idsLibros,
-                                                  String[] titulosLibros,
-                                                  String[] fechasPrestamo,
-                                                  String[] fechasDevolucionPrevista,
-                                                  long[] diasAtraso) {
-        String s = "Estimado/a " + nvl(nombreCompletoUsuario) + ",\n\n" +
-                   "Le recordamos que tiene devolución pendiente de los siguientes materiales:\n\n";
-        long max = 0L;
-        int n = (idsLibros != null) ? idsLibros.length : 0;
+ 	public static String cuerpoNotificacionAtraso(
+ 			String nombreCompletoUsuario,
+            int[] idsLibros,
+            String[] titulosLibros,
+            String[] fechasPrestamo,
+            String[] fechasDevolucionPrevista,
+            long[] diasAtraso) {
 
-        for (int i = 0; i < n; i++) {
-            s += "- Título: \"" + nvl(getStr(titulosLibros, i)) + "\" (ID: " + getInt(idsLibros, i) + ")\n";
-            s += "  • Fecha préstamo: " + nvl(getStr(fechasPrestamo, i)) + "\n";
-            s += "  • Fecha límite: " + nvl(getStr(fechasDevolucionPrevista, i)) + "\n";
-            long d = getLong(diasAtraso, i);
-            s += "  • Días de atraso: " + d + "\n\n";
-            if (d > max) max = d;
-        }
+ 		String nombreSeguro;
+ 		if (nombreCompletoUsuario == null) {
+ 			nombreSeguro = "";
+ 		} else {
+ 			nombreSeguro = nombreCompletoUsuario;
+ 		}
 
-        s += "El mayor atraso registrado es de " + max + " día(s).\n\n" +
-             "Por favor, regularice su situación a la brevedad.\n\n" +
-             "Saludos cordiales,\nBiblioteca INET";
-        return s;
-    }
+ 		StringBuilder cuerpo = new StringBuilder();
+ 		cuerpo.append("Estimado/a ").append(nombreSeguro).append(",\n\n");
+ 		cuerpo.append("Le recordamos que tiene devolución pendiente de los siguientes materiales:\n\n");
 
-    // Cuerpo para constancias de devolución
-    public static String cuerpoConstancia(String nombreCompletoUsuario,
-                                          int[] idsLibros,
-                                          String[] titulosLibros,
-                                          String[] fechasPrestamo,
-                                          String[] fechasDevolucionPrevista,
-                                          String fechaEmision) {
-        String s = "Estimado/a " + nvl(nombreCompletoUsuario) + ",\n\n";
-        int n = (idsLibros != null) ? idsLibros.length : 0;
+ 		long mayorAtraso = 0L;
 
-        if (n <= 1) {
-            s += "Se emite constancia de devolución del siguiente material:\n\n";
-        } else {
-            s += "Se emiten constancias de devolución de los siguientes materiales:\n\n";
-        }
+ 		int cantidadElementos;
+ 		if (idsLibros == null) {
+ 			cantidadElementos = 0;
+ 		} else {
+ 			cantidadElementos = idsLibros.length;
+ 		}
 
-        for (int i = 0; i < n; i++) {
-            s += "- Título: \"" + nvl(getStr(titulosLibros, i)) + "\" (ID: " + getInt(idsLibros, i) + ")\n";
-            s += "  • Fecha préstamo: " + nvl(getStr(fechasPrestamo, i)) + "\n";
-            s += "  • Fecha límite: " + nvl(getStr(fechasDevolucionPrevista, i)) + "\n\n";
-        }
+ 		int i = 0;
+ 		while (i < cantidadElementos) {
+ 			// Título seguro
+ 			String tituloSeguro;
+ 			if (titulosLibros != null && i >= 0 && i < titulosLibros.length && titulosLibros[i] != null) {
+ 				tituloSeguro = titulosLibros[i];
+ 			} else {
+ 				tituloSeguro = "";
+ 			}
 
-        s += "Fecha de emisión: " + nvl(fechaEmision) + "\n\n" +
-             "Gracias por su colaboración.\n\n" +
-             "Atentamente,\nBiblioteca INET";
-        return s;
-    }
-    
-    private static boolean esCorreoValido(String email) {
-        if (email == null) return false;
-        return email.matches("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$");
-    }
+ 			// Fecha préstamo segura
+ 			String fechaPrestamoSegura;
+ 			if (fechasPrestamo != null && i >= 0 && i < fechasPrestamo.length && fechasPrestamo[i] != null) {
+ 				fechaPrestamoSegura = fechasPrestamo[i];
+ 			} else {
+ 				fechaPrestamoSegura = "";
+ 			}
 
-    private static ArrayList<String> destinatariosValidos(String texto) {
-        ArrayList<String> out = new ArrayList<String>();
-        if (texto == null) return out;
-        String t = texto.trim();
-        if (t.isEmpty()) return out;
-        String[] arr = t.split("[,;\\s]+");
-        for (int i = 0; i < arr.length; i++) {
-            if (esCorreoValido(arr[i])) out.add(arr[i]);
-        }
-        return out;
-    }
-    
-    private static String nvl(String s) { return (s == null) ? "" : s; }
-    private static String getStr(String[] a, int i) { return (a != null && i >= 0 && i < a.length) ? a[i] : ""; }
-    private static int getInt(int[] a, int i) { return (a != null && i >= 0 && i < a.length) ? a[i] : 0; }
-    private static long getLong(long[] a, int i) { return (a != null && i >= 0 && i < a.length) ? a[i] : 0L; }
+ 			// Fecha devolución prevista segura
+ 			String fechaDevolucionSegura;
+ 			if (fechasDevolucionPrevista != null && i >= 0 && i < fechasDevolucionPrevista.length && fechasDevolucionPrevista[i] != null) {
+ 				fechaDevolucionSegura = fechasDevolucionPrevista[i];
+ 			} else {
+ 				fechaDevolucionSegura = "";
+ 			}
 
+ 			// ID seguro
+ 			int idSeguro;
+ 			if (idsLibros != null && i >= 0 && i < idsLibros.length) {
+ 				idSeguro = idsLibros[i];
+ 			} else {
+ 				idSeguro = 0;
+ 			}
+
+ 			// Días de atraso seguros
+ 			long diasAtrasoSeguro;
+ 			if (diasAtraso != null && i >= 0 && i < diasAtraso.length) {
+ 				diasAtrasoSeguro = diasAtraso[i];
+ 			} else {
+ 				diasAtrasoSeguro = 0L;
+ 			}
+
+ 			cuerpo.append("- Título: \"").append(tituloSeguro).append("\" (ID: ").append(idSeguro).append(")\n");
+ 			cuerpo.append("  • Fecha préstamo: ").append(fechaPrestamoSegura).append("\n");
+ 			cuerpo.append("  • Fecha límite: ").append(fechaDevolucionSegura).append("\n");
+ 			cuerpo.append("  • Días de atraso: ").append(diasAtrasoSeguro).append("\n\n");
+
+ 			if (diasAtrasoSeguro > mayorAtraso) {
+ 				mayorAtraso = diasAtrasoSeguro;
+ 			}
+
+ 			i = i + 1;
+ 		}
+
+ 		cuerpo.append("El mayor atraso registrado es de ").append(mayorAtraso).append(" día(s).\n\n");
+ 		cuerpo.append("Por favor, regularice su situación a la brevedad.\n\n");
+ 		cuerpo.append("Saludos cordiales,\nBiblioteca INET");
+
+ 		return cuerpo.toString();
+ 	}
+
+ 	//Cuerpo para constancias de devolución
+ 	public static String cuerpoConstancia(
+ 			String nombreCompletoUsuario,
+ 			int[] idsLibros,
+ 			String[] titulosLibros,
+ 			String[] fechasPrestamo,
+ 			String[] fechasDevolucionPrevista,
+ 			String fechaEmision) {
+
+ 		String nombreSeguro;
+ 		if (nombreCompletoUsuario == null) {
+ 			nombreSeguro = "";
+ 		} else {
+ 			nombreSeguro = nombreCompletoUsuario;
+ 		}
+
+ 		String fechaEmisionSegura;
+ 		if (fechaEmision == null) {
+ 			fechaEmisionSegura = "";
+ 		} else {
+ 			fechaEmisionSegura = fechaEmision;
+ 		}
+
+ 		StringBuilder cuerpo = new StringBuilder();
+ 		cuerpo.append("Estimado/a ").append(nombreSeguro).append(",\n\n");
+
+ 		int cantidadElementos;
+ 		if (idsLibros == null) {
+ 			cantidadElementos = 0;
+ 		} else {
+ 			cantidadElementos = idsLibros.length;
+ 		}
+
+ 		if (cantidadElementos <= 1) {
+ 			cuerpo.append("Se emite constancia de devolución del siguiente material:\n\n");
+ 		} else {
+ 			cuerpo.append("Se emiten constancias de devolución de los siguientes materiales:\n\n");
+ 		}
+
+ 		int i = 0;
+ 		while (i < cantidadElementos) {
+ 			// Título seguro
+ 			String tituloSeguro;
+ 			if (titulosLibros != null && i >= 0 && i < titulosLibros.length && titulosLibros[i] != null) {
+ 				tituloSeguro = titulosLibros[i];
+ 			} else {
+ 				tituloSeguro = "";
+ 			}
+
+ 			// Fecha préstamo segura
+ 			String fechaPrestamoSegura;
+ 			if (fechasPrestamo != null && i >= 0 && i < fechasPrestamo.length && fechasPrestamo[i] != null) {
+ 				fechaPrestamoSegura = fechasPrestamo[i];
+ 			} else {
+ 				fechaPrestamoSegura = "";
+ 			}
+
+ 			// Fecha devolución prevista segura
+ 			String fechaDevolucionSegura;
+ 			if (fechasDevolucionPrevista != null && i >= 0 && i < fechasDevolucionPrevista.length && fechasDevolucionPrevista[i] != null) {
+ 				fechaDevolucionSegura = fechasDevolucionPrevista[i];
+ 			} else {
+ 				fechaDevolucionSegura = "";
+ 			}
+
+ 			// ID seguro
+ 			int idSeguro;
+ 			if (idsLibros != null && i >= 0 && i < idsLibros.length) {
+ 				idSeguro = idsLibros[i];
+ 			} else {
+ 				idSeguro = 0;
+ 			}
+
+ 			cuerpo.append("- Título: \"").append(tituloSeguro).append("\" (ID: ").append(idSeguro).append(")\n");
+ 			cuerpo.append("  • Fecha préstamo: ").append(fechaPrestamoSegura).append("\n");
+ 			cuerpo.append("  • Fecha límite: ").append(fechaDevolucionSegura).append("\n\n");
+
+ 			i = i + 1;
+ 		}
+
+ 		cuerpo.append("Fecha de emisión: ").append(fechaEmisionSegura).append("\n\n");
+ 		cuerpo.append("Gracias por su colaboración.\n\n");
+ 		cuerpo.append("Atentamente,\nBiblioteca INET");
+
+ 		return cuerpo.toString();
+ 	}
+
+ 	//Valida una dirección de correo con una expresión regular simple
+ 	private static boolean esCorreoValido(String email) {
+ 		if (email == null) {
+ 			return false;
+ 		}
+
+ 		String patron = "^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$";
+ 		boolean coincide = email.matches(patron);
+
+ 		if (coincide) {
+ 			return true;
+ 		} else {
+ 			return false;
+ 		}
+ 	}
+
+ 	//Separa una cadena con 1..N correos y devuelve solo los válidos
+ 	private static ArrayList<String> destinatariosValidos(String texto) {
+ 		ArrayList<String> listaValidos = new ArrayList<String>();
+
+ 		if (texto == null) {
+ 			return listaValidos;
+ 		}
+
+ 		String textoSinEspaciosExtremos = texto.trim();
+ 		if (textoSinEspaciosExtremos.isEmpty()) {
+ 			return listaValidos;
+ 		}
+
+ 		String[] posiblesCorreos = textoSinEspaciosExtremos.split("[,;\\s]+");
+
+ 		int i = 0;
+ 		while (i < posiblesCorreos.length) {
+ 			String candidato = posiblesCorreos[i];
+ 			boolean valido = esCorreoValido(candidato);
+
+ 			if (valido) {
+ 				listaValidos.add(candidato);
+ 			}
+
+ 			i = i + 1;
+ 		}
+
+ 		return listaValidos;
+ 	}
 	
 }
