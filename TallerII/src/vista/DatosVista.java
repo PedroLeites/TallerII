@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import controlador.ManejadoraDeDatos;
 import controlador.ManejadoraDeCorreos;
+import controlador.ManejadoraDePersistencia; 
 
 import modelo.Usuario;
 import modelo.Prestamo;
@@ -19,6 +20,7 @@ import modelo.ColeccionPrestamos;
 public class DatosVista extends JFrame {
 	private ManejadoraDeDatos controladorDatos;
 	private ManejadoraDeCorreos controladorCorreos;
+	private ManejadoraDePersistencia controladorPersistencia;
 	
 	private JTable tabla;
 	private DefaultTableModel modeloTabla;
@@ -26,6 +28,7 @@ public class DatosVista extends JFrame {
 	private JButton btnCargar = new JButton("Cargar datos");
 	private JTextField campoBuscarID = new JTextField(10);
 	private JButton btnBuscarPorID = new JButton("Buscar por ID");
+	private JButton btnConsultarHistorial = new JButton("Consultar historial por ID");
 	
 	private JButton btnNotifFila = new JButton("Notificar atraso (fila)");
     private JButton btnNotifUsuario = new JButton("Notificar atraso (usuario)");
@@ -37,13 +40,13 @@ public class DatosVista extends JFrame {
 	JPanel panelCorreo = new JPanel(new FlowLayout(FlowLayout.CENTER));
 	
 	public DatosVista() {
-		super("Datos de préstamos vencidos");
+		super("Datos de prÃ©stamos vencidos");
 		
-		//Columnas de la tabla para mostrar los datos de los préstamos
+		//Columnas de la tabla para mostrar los datos de los prÃ©stamos
         modeloTabla = new DefaultTableModel(new String[] {
-        		"Fecha Préstamo", "Fecha Devolución Prevista", "Días de Retraso",
-                "ID Usuario", "Nombre Completo", "Correo Electrónico",
-                "Título del Libro", "ID del Libro"
+        		"Fecha PrÃ©stamo", "Fecha DevoluciÃ³n Prevista", "DÃ­as de Retraso",
+                "ID Usuario", "Nombre Completo", "Correo ElectrÃ³nico",
+                "TÃ­tulo del Libro", "ID del Libro"
         }, 0);
         tabla = new JTable(modeloTabla);
         
@@ -56,6 +59,7 @@ public class DatosVista extends JFrame {
         panelBotones.add(new JLabel("ID Usuario:"));
         panelBotones.add(campoBuscarID);
         panelBotones.add(btnBuscarPorID);
+        panelBotones.add(btnConsultarHistorial);
         
         this.add(panelBotones, BorderLayout.SOUTH);
         
@@ -86,7 +90,7 @@ public class DatosVista extends JFrame {
 				
 				ColeccionUsuarios cu = this.controladorDatos.obtenerUsuarios();
 				if(cu == null || cu.vacia()) {
-					mostrarInfo("No se encontraron préstamos para mostrar.");
+					mostrarInfo("No se encontraron prÃ©stamos para mostrar.");
 				}else {
 					for(int i = 0; i < cu.largo(); i++) {
 						Usuario u = cu.obtenerUsuarioPorPosicion(i);
@@ -106,11 +110,11 @@ public class DatosVista extends JFrame {
 		this.btnBuscarPorID.addActionListener(e-> {
 			int id = getIDUsuarioBuscado();
 			if (id <= -1) {
-		        mostrarError("Ingrese un ID válido.");
+		        mostrarError("Ingrese un ID vÃ¡lido.");
 		        return;
 		    }
 
-		    //Verifica si los datos ya están cargados
+		    //Verifica si los datos ya estÃ¡n cargados
 		    modelo.ColeccionUsuarios cu = this.controladorDatos.obtenerUsuarios();
 		    if (cu == null || cu.vacia()) {
 		        try {
@@ -134,10 +138,10 @@ public class DatosVista extends JFrame {
 		        return;
 		    }
 
-		    //Muestra préstamos
+		    //Muestra prÃ©stamos
 		    modelo.ColeccionPrestamos cp = this.controladorDatos.obtenerPrestamosDeUsuario(id);
 		    if (cp == null || cp.vacia()) {
-		        mostrarInfo("El usuario no tiene préstamos para mostrar.");
+		        mostrarInfo("El usuario no tiene prÃ©stamos para mostrar.");
 		        return;
 		    }
 
@@ -152,7 +156,7 @@ public class DatosVista extends JFrame {
 	public void setControladorCorreo(ManejadoraDeCorreos controlador) {
 		this.controladorCorreos = controlador;
 		
-		// Notificar atraso por préstamo (fila)
+		// Notificar atraso por prÃ©stamo (fila)
         btnNotifFila.addActionListener(e -> {
             int row = tabla.getSelectedRow();
             if (row == -1) {
@@ -173,9 +177,9 @@ public class DatosVista extends JFrame {
                 controladorCorreos.enviarNotificacionAtrasoPorPrestamo(
                     destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev, dias
                 );
-                mostrarInfo("Notificación enviada correctamente.");
+                mostrarInfo("NotificaciÃ³n enviada correctamente.");
             } catch (RuntimeException ex) {
-            	mostrarError("No se pudo enviar la notificación.\n" + ex.getMessage());
+            	mostrarError("No se pudo enviar la notificaciÃ³n.\n" + ex.getMessage());
             }
             
         });
@@ -211,7 +215,7 @@ public class DatosVista extends JFrame {
             }
 
             if (ids.isEmpty()) {
-                mostrarInfo("No hay préstamos visibles para ese usuario.");
+                mostrarInfo("No hay prÃ©stamos visibles para ese usuario.");
                 return;
             }
 
@@ -219,14 +223,14 @@ public class DatosVista extends JFrame {
             	controladorCorreos.enviarNotificacionAtrasoPorUsuario(
                         destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev, dias
                     );
-            	mostrarInfo("Notificación enviada correctamente.");
+            	mostrarInfo("NotificaciÃ³n enviada correctamente.");
             } catch (RuntimeException ex) {
-            	mostrarError("No se pudo enviar la notificación.\n" + ex.getMessage());
+            	mostrarError("No se pudo enviar la notificaciÃ³n.\n" + ex.getMessage());
             }
        
         });
 
-        // Constancia por préstamo (fila)
+        // Constancia por prÃ©stamo (fila)
         btnConstFila.addActionListener(e -> {
             int row = tabla.getSelectedRow();
             if (row == -1) {
@@ -246,9 +250,9 @@ public class DatosVista extends JFrame {
             	controladorCorreos.enviarConstanciaPorPrestamo(
                         destinatario, cedula, nombre, idLibro, titulo, fPrest, fDev
                     );
-            	mostrarInfo("Notificación enviada correctamente.");
+            	mostrarInfo("NotificaciÃ³n enviada correctamente.");
             } catch (RuntimeException ex) {
-            	mostrarError("No se pudo enviar la notificación.\n" + ex.getMessage());
+            	mostrarError("No se pudo enviar la notificaciÃ³n.\n" + ex.getMessage());
             }
             
         });
@@ -282,7 +286,7 @@ public class DatosVista extends JFrame {
             }
 
             if (ids.isEmpty()) {
-                mostrarInfo("No hay préstamos visibles para ese usuario.");
+                mostrarInfo("No hay prÃ©stamos visibles para ese usuario.");
                 return;
             }
  
@@ -290,14 +294,14 @@ public class DatosVista extends JFrame {
             	controladorCorreos.enviarConstanciasPorUsuario(
                         destinatario, idUsuario, nombre, ids, titulos, fPrest, fDev
                     );
-            	mostrarInfo("Notificación enviada correctamente.");
+            	mostrarInfo("NotificaciÃ³n enviada correctamente.");
             } catch (RuntimeException ex) {
-            	mostrarError("No se pudo enviar la notificación.\n" + ex.getMessage());
+            	mostrarError("No se pudo enviar la notificaciÃ³n.\n" + ex.getMessage());
             }
             
         });
         
-        //Enviar notificación de atraso a todos los usuarios
+        //Enviar notificaciÃ³n de atraso a todos los usuarios
         btnNotifTodos.addActionListener(e -> {
         	int total = modeloTabla.getRowCount();
             if (total == 0) {
@@ -337,12 +341,30 @@ public class DatosVista extends JFrame {
                 controladorCorreos.enviarNotificacionesAtrasoATodos(mapa);
                 mostrarInfo("Se enviaron las notificaciones a todos los usuarios visibles.");
             } catch (RuntimeException ex) {
-            	mostrarError("Ocurrió un error al enviar algunas notificaciones.\n" + ex.getMessage());
+            	mostrarError("OcurriÃ³ un error al enviar algunas notificaciones.\n" + ex.getMessage());
             }
             
         });
         
 }
+	
+	public void setControladorPersistencia(ManejadoraDePersistencia controlador) {
+		this.controladorPersistencia = controlador;
+		
+		//Consutar Historial
+		btnConsultarHistorial.addActionListener(e -> {
+			int id = getIDUsuarioBuscado();
+            if (id <= -1) {
+                mostrarError("Ingrese un ID vÃ¡lido.");
+                return;
+            }
+            System.out.println("Consultar historial ID=" + id);
+            
+            VentanaHistorial vh = new VentanaHistorial(this, controladorPersistencia, id);
+            vh.setVisible(true);
+		});
+		
+	}
 	
     public void agregarFila(Usuario usuario, Prestamo prestamo) { 
     	this.modeloTabla.addRow(new Object[] {
@@ -362,14 +384,14 @@ public class DatosVista extends JFrame {
     }
     
     public void mostrarInfo(String msg) {
-        JOptionPane.showMessageDialog(this, msg, "Información", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, msg, "InformaciÃ³n", JOptionPane.INFORMATION_MESSAGE);
     }
     
     public void mostrarError(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
 	
- // Método que el controlador usará para obtener la fila seleccionada
+ // MÃ©todo que el controlador usarÃ¡ para obtener la fila seleccionada
     public Object[] getDatosFilaSeleccionada() {
         int fila = tabla.getSelectedRow();
         if (fila == -1) return null;

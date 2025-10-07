@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.SQLException;
 
 public class ManejadoraDeCorreos {
 	private ColeccionHistorial coleccionHistorial;
+	private ManejadoraDePersistencia controladorPersistencia;
 	
     public ManejadoraDeCorreos() {
     	this.coleccionHistorial = new ColeccionHistorial();
@@ -25,10 +28,15 @@ public class ManejadoraDeCorreos {
         }
     }
     
+    public void setManejadoraDePersistencia(ManejadoraDePersistencia mp) {
+        this.controladorPersistencia = mp;
+    }
+    
     public ColeccionHistorial getColeccionHistorial() {
         return this.coleccionHistorial;
     }
     
+    //Métodos de envío
     public void enviarConstanciaPorPrestamo(String destinatario,
             								int idUsuario,
             								String nombreCompleto,
@@ -75,6 +83,7 @@ public class ManejadoraDeCorreos {
     	// 4) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
     	coleccionHistorial.agregarHistorial(historial);
+    	persistirHistorial(historial);
     }
 
     public void enviarConstanciasPorUsuario(String destinatario,
@@ -107,6 +116,7 @@ public class ManejadoraDeCorreos {
     	// 5) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
     	coleccionHistorial.agregarHistorial(historial);
+    	persistirHistorial(historial);
     }
     
     public void enviarNotificacionAtrasoPorPrestamo(String destinatario,
@@ -157,6 +167,7 @@ public class ManejadoraDeCorreos {
     	// 4) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
     	coleccionHistorial.agregarHistorial(historial);
+    	persistirHistorial(historial);
     }
     
     public void enviarNotificacionAtrasoPorUsuario(String destinatario,
@@ -188,6 +199,7 @@ public class ManejadoraDeCorreos {
     	// 5) Instanciar y guardar en el historial
     	Historial historial = new Historial(idUsuario, correo);
     	coleccionHistorial.agregarHistorial(historial);
+    	persistirHistorial(historial);
     }
     
     public void enviarNotificacionesAtrasoATodos(Map<Integer, DatosUsuarioAtraso> mapa) {
@@ -223,6 +235,22 @@ public class ManejadoraDeCorreos {
         public java.util.ArrayList<String> fDev = new java.util.ArrayList<>();
         public java.util.ArrayList<Long> dias = new java.util.ArrayList<>();
     }
-
+    
+    private void persistirHistorial(Historial historial) {
+        if (controladorPersistencia == null) {
+            System.err.println("[WARN] Persistencia no inyectada; solo memoria.");
+            return;
+        }
+        try {
+            long id = controladorPersistencia.insertarHistorial(historial);
+            System.out.println("[OK] Insertado idEnvio=" + id + " usuario=" + historial.getIdUsuario()
+                + " tipo=" + historial.getCorreo().getTipo());
+        } catch (SQLIntegrityConstraintViolationException dup) {
+            System.err.println("[INFO] Duplicado día/tipo: " + dup.getMessage());
+        } catch (SQLException e) {
+            System.err.println("[ERROR] Persistencia falló: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
   
 }

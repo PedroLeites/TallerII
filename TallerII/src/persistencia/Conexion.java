@@ -54,4 +54,8 @@ public class Conexion {
     	return this.conexion;
     }
     
+    public boolean estaConectado() {
+        return conexion != null;
+    }
+    
 }
